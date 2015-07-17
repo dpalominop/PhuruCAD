@@ -1,26 +1,18 @@
 # Phuru gui init module
 # (c) 2001 Juergen Riegel LGPL
 
-import sys
-import os
-import random
-
-import FreeCAD,FreeCADGui
-#from FreeCAD import Vector
+import FreeCAD as App
+import FreeCADGui as Gui
 import Part,PartGui
 
-#from PyQt4 import QtGui,QtCore
-#import serial
-
-#PuertoSerie = serial.Serial('/dev/ttyUSB0', 9600)
-	
-#doc = App.newDocument("PHURU")
-#l = Part.Line()
-
 class PhuruWorkbench ( Workbench ):
+	from PySide import QtGui,QtCore
 	"Phuru workbench object"
 	MenuText = "Phuru"
 	ToolTip = "Phuru workbench"
+	timer = QtCore.QTimer()
+	#doc = App.newDocument("PHURU")
+	#l = Part.Line()
 	
 	def Initialize(self):
 		# load the module
@@ -40,35 +32,28 @@ class PhuruWorkbench ( Workbench ):
 		Msg ("PhuruWorkbench.Deactivated()\n")
 	
 	def iniciarProceso(self):
-		from PyQt4 import QtGui,QtCore
-		from FreeCAD import Vector
 		import serial
+		#from PySide import QtGui,QtCore
 		
-		Msg (" .... \n")
 		doc = App.newDocument("PHURU")
 		l = Part.Line()
-		l.StartPoint = Vector(0.0,0.0,0.0)
+		l.StartPoint = App.Vector(0.0,0.0,0.0)
 		
-		Msg ("Iniciado funcion\n")
 		PuertoSerie = serial.Serial('/dev/ttyUSB0', 9600)
+		
 		def dibujarPunto():
-			Msg ("Dibujar Punto \n")
 			sDatos = PuertoSerie.readline()
 			x,y,z,d = sDatos.split(",")
 			
-			Msg ("sumar punto \n")
-			l.EndPoint = l.EndPoint.add(Vector(float(x),float(y),float(z)))
-			Msg ("Punto sumado")
+			l.EndPoint = l.EndPoint.add(App.Vector(float(x),float(y),float(z)))
 			
 			doc.addObject("Part::Feature","Line").Shape = l.toShape() 
 			doc.recompute()
-			#l.StartPoint = Vector(l.EndPoint.x, l.EndPoint.y, l.EndPoint.z)
-			
-		dibujarPunto()
-		Msg ("Iniciando Timer\n")
-		timer = QtCore.QTimer()
-		timer.timeout.connect(dibujarPunto)
-		timer.start(1000)
-		Msg ("Finalizando Timer\n")
+			l.StartPoint = l.EndPoint.add(App.Vector(0.0,0.0,0.0))
 
-FreeCADGui.addWorkbench(PhuruWorkbench())
+		#timer = QtCore.QTimer()
+		self.timer.timeout.connect(dibujarPunto)
+		self.timer.start(1000)
+		
+
+Gui.addWorkbench(PhuruWorkbench())
