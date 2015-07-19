@@ -1,5 +1,6 @@
 # Phuru gui init module
 # (c) 2001 Juergen Riegel LGPL¿
+import FreeCADGui
 
 class PhuruWorkbench ( Workbench ):
 	"Phuru workbench object"
@@ -46,4 +47,4 @@ class PhuruWorkbench ( Workbench ):
 		# do something here if needed...
 		Msg ("PhuruWorkbench.Deactivated()\n")
 
-FreeCADGui.addWorkbench(PhuruWorkbench)
+FreeCADGui.addWorkbench(PhuruWorkbench())

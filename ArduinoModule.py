@@ -1,10 +1,10 @@
 import FreeCAD as App
 import FreeCADGui as Gui
-import Part,PartGui
+import Part
 
 class MyTool:
     "My tool object"
-    from PySide import QtGui,QtCore
+    from PySide import QtCore
     timer = QtCore.QTimer()
 
     def GetResources(self):
