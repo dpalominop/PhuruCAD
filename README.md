@@ -26,6 +26,7 @@ This README would normally document whatever steps are necessary to get your app
 ### Who do I talk to? ###
 
 * Autor: Daniel Palomino
-** Correo: dpalomino@phuru.pe
+* Correo: dpalomino@phuru.pe
+
 * Equipo: PHURU
 * Correo: team@phuru.pe
