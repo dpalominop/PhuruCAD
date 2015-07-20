@@ -1,10 +1,12 @@
 import FreeCAD as App
 import FreeCADGui as Gui
 import Part
+from PySide import QtCore
+import serial
 
 class MyTool:
     "My tool object"
-    from PySide import QtCore
+    
     timer = QtCore.QTimer()
 
     def GetResources(self):
@@ -22,10 +24,10 @@ class MyTool:
             "..############..",
             "..############..",
             "..############..",
-            "......####......",
-            "......####......",
-            "......####......",
-            "......####......",
+            "..##..####..##..",
+            "..##..####..##..",
+            "..##..####..##..",
+            "..##..####..##..",
             "......####......",
             "......####......",
             "......####......",
@@ -48,8 +50,6 @@ class MyTool:
         self.iniciarProceso()
         
     def iniciarProceso(self):
-        import serial
-        #from PySide import QtGui,QtCore
         
         doc = App.newDocument("PHURU")
         l = Part.Line()
