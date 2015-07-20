@@ -4,15 +4,20 @@ import Part
 from PySide import QtCore
 import serial
 
-class MyTool:
-    "My tool object"
+class USBTool():
+    "Iniciar dispositivo por USB"
+    
+    PuertoSerie = None
     
     timer = QtCore.QTimer()
+    #timer.timeout.connect(dibujarPunto)
+    timer.start(500)
+    
 
     def GetResources(self):
-        return {"MenuText": "My Command",
+        return {"MenuText": "USB",
                        "Accel": "Ctrl+M",
-                       "ToolTip": "Comando de DANIEL",
+                       "ToolTip": "Iniciar dispositivo por USB",
                        "Pixmap"  : """
             /* XPM */
             static const char *test_icon[]={
@@ -39,36 +44,39 @@ class MyTool:
 
     def IsActive(self):
         return True
-        #if FreeCAD.ActiveDocument == None:
-        #    return False
-        #else:
-        #    return True
 
     def Activated(self):
-        # do something here...
-        print "Activando comando"
-        self.iniciarProceso()
+        if self.PuertoSerie == None:
+            self.iniciarProceso()
+        else:
+            self.detenerProceso()
         
     def iniciarProceso(self):
+        self.doc = App.activeDocument()
+        if self.doc == None:
+            self.doc = App.newDocument("PHURU")
+
+        self.l = Part.Line()
+        self.l.StartPoint = App.Vector(0.0,0.0,0.0)
         
-        doc = App.newDocument("PHURU")
-        l = Part.Line()
-        l.StartPoint = App.Vector(0.0,0.0,0.0)
+        self.PuertoSerie = serial.Serial('/dev/ttyUSB0', 9600)
         
-        PuertoSerie = serial.Serial('/dev/ttyUSB0', 9600)
+    def detenerProceso(self):
+        self.PuertoSerie.close()
+        self.PuertoSerie = None
         
-        def dibujarPunto():
-            sDatos = PuertoSerie.readline()
+    def dibujarPunto(self):
+        if self.PuertoSerie == None:
+            return
+        else:
+            sDatos = self.PuertoSerie.readline()
             x,y,z,d = sDatos.split(",")
             
-            l.EndPoint = l.EndPoint.add(App.Vector(float(x),float(y),float(z)))
+            self.l.EndPoint = self.l.EndPoint.add(App.Vector(float(x),float(y),float(z)))
             
-            doc.addObject("Part::Feature","Line").Shape = l.toShape() 
-            doc.recompute()
-            l.StartPoint = l.EndPoint.add(App.Vector(0.0,0.0,0.0))
+            self.doc.addObject("Part::Feature","Line").Shape = self.l.toShape() 
+            self.doc.recompute()
+            self.l.StartPoint = self.l.EndPoint.add(App.Vector(0.0,0.0,0.0))
 
-        #timer = QtCore.QTimer()
-        self.timer.timeout.connect(dibujarPunto)
-        self.timer.start(1000)
-
-Gui.addCommand('ArduinoCAD', MyTool())
+Gui.addCommand('USBTool', USBTool())
+    

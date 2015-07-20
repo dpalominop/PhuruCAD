@@ -32,8 +32,8 @@ class PhuruWorkbench ( Workbench ):
 
 	def Initialize(self):
 		import ArduinoModule
-		self.appendToolbar("My Tools", ["ArduinoCAD"])
-		self.appendMenu("My Tools", ["ArduinoCAD"])
+		self.appendToolbar("PHURU", ["USBTool"])
+		self.appendMenu("PHURU", ["USBTool"])
 
 	def GetClassName(self):
 		#return "PhuruGui::Workbench"
