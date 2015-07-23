@@ -14,7 +14,7 @@ class Ph_Configuracion(object):
                        "Accel": "Ctrl+O",
                        "ToolTip": "Configuraciones Avanzadas",
                        "Pixmap"  : ":icons/tuerca.png"
-                }
+        }
 
     def IsActive(self):
         return True
