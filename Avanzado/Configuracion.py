@@ -6,6 +6,8 @@ Created on 23/7/2015
 '''
 
 import FreeCADGui as Gui
+from Ventanas import *
+
 class Ph_Configuracion(object):
     '''
     classdocs
@@ -15,13 +17,15 @@ class Ph_Configuracion(object):
         return {"MenuText": "Configuracion",
                        "Accel": "Ctrl+O",
                        "ToolTip": "Configuraciones Avanzadas",
-                       "Pixmap"  : ":icons/tuerca.png"
+                       "Pixmap"  : ""
         }
 
     def IsActive(self):
         return True
 
     def Activated(self):
-        return True
+        self.ex = Example()
+    
+    
         
 Gui.addCommand('Configuracion', Ph_Configuracion())
