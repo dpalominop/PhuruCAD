@@ -31,9 +31,12 @@ class PhuruWorkbench ( Workbench ):
 	ToolTip = "Phuru workbench"
 
 	def Initialize(self):
-		import ArduinoModule
-		self.appendToolbar("PHURU", ["USBTool"])
-		self.appendMenu("PHURU", ["USBTool"])
+		from Conectividad import PhUSB, PhWifi
+		from Avanzado import Configuracion
+		self.appendToolbar("PHURU", ["USB_Tool"])
+		self.appendToolbar("PHURU", ["WIFI_Tool"])
+		self.appendMenu(["PHURU", "Conectividad"], ["WIFI_Tool", "USB_Tool"])
+		self.appendMenu(["PHURU", "Avanzado ..."], ["Separator", "Configuracion"])
 
 	def GetClassName(self):
 		#return "PhuruGui::Workbench"

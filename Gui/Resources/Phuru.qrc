@@ -1,4 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
-    <qresource> 
+    <qresource>
+    	<file>icons/tuerca.png</file>
+    	<file>icons/wifi.png</file>
+    	<file>icons/usb.png</file>
     </qresource>
 </RCC> 

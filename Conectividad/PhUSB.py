@@ -4,14 +4,14 @@ import Part
 from PySide import QtCore
 import serial
 
-class USBTool():
+class Ph_USB():
     "Iniciar dispositivo por USB"
     
     PuertoSerie = None
     
     timer = QtCore.QTimer()
     #timer.timeout.connect(dibujarPunto)
-    timer.start(500)
+    #timer.start(500)
     
 
     def GetResources(self):
@@ -58,7 +58,8 @@ class USBTool():
 
         self.l = Part.Line()
         self.l.StartPoint = App.Vector(0.0,0.0,0.0)
-        
+        self.timer.timeout.connect(self.dibujarPunto)
+        self.timer.start(500)
         self.PuertoSerie = serial.Serial('/dev/ttyUSB0', 9600)
         
     def detenerProceso(self):
@@ -78,5 +79,5 @@ class USBTool():
             self.doc.recompute()
             self.l.StartPoint = self.l.EndPoint.add(App.Vector(0.0,0.0,0.0))
 
-Gui.addCommand('USBTool', USBTool())
+Gui.addCommand('USB_Tool', Ph_USB())
     
