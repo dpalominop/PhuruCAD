@@ -1,5 +1,10 @@
-# Phuru gui init module
-# (c) 2001 Juergen Riegel LGPL¿
+'''
+Created on 23/7/2015
+
+@author: Daniel Palomino
+@contact: dpalomino@phuru.pe
+'''
+
 import FreeCADGui
 
 class PhuruWorkbench ( Workbench ):

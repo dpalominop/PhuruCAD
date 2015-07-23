@@ -1,8 +1,10 @@
 '''
 Created on 23/7/2015
 
-@author: dpalominop
+@author: Daniel Palomino
+@contact: dpalomino@phuru.pe
 '''
+
 import FreeCADGui as Gui
 class Ph_Configuracion(object):
     '''

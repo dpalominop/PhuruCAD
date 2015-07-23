@@ -1,3 +1,10 @@
+'''
+Created on 20/7/2015
+
+@author: Daniel Palomino
+@contact: dpalomino@phuru.pe
+'''
+
 import FreeCAD as App
 import FreeCADGui as Gui
 import Part

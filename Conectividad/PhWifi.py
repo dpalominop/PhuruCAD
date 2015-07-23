@@ -1,8 +1,8 @@
 '''
-Created on 22/7/2015
+Created on 23/7/2015
 
 @author: Daniel Palomino
-@email: dpalomino@phuru.pe
+@contact: dpalomino@phuru.pe
 '''
 import FreeCADGui as Gui
 class Ph_Wifi():
