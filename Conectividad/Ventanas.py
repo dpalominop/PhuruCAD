@@ -1,7 +1,8 @@
 '''
 Created on 23/7/2015
 
-@author: dpalominop
+@author: Daniel Palomino
+@contact: dpalomino@phuru.pe
 '''
 
 from PyQt4 import QtGui, QtCore

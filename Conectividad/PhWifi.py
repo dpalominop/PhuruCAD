@@ -5,7 +5,8 @@ Created on 23/7/2015
 @contact: dpalomino@phuru.pe
 '''
 import FreeCADGui as Gui
-from Ventanas import *
+#from Ventanas import Example
+from mi_ventana import Principal
 
 class Ph_Wifi():
     def GetResources(self):
@@ -19,6 +20,7 @@ class Ph_Wifi():
         return True
 
     def Activated(self):
-        self.ex = Example()
+        #self.ex = Example()
+        self.principal = Principal()
 
 Gui.addCommand('WIFI_Tool', Ph_Wifi())
