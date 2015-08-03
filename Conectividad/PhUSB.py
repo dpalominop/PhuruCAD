@@ -22,7 +22,7 @@ class Ph_USB():
     
 
     def GetResources(self):
-        return {"MenuText": "USB",
+        return {"MenuText": "&USB",
                        "Accel": "Ctrl+M",
                        "ToolTip": "Iniciar dispositivo por USB",
                        "Pixmap"  : ""

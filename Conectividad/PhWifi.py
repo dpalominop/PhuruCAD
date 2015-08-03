@@ -5,12 +5,11 @@ Created on 23/7/2015
 @contact: dpalomino@phuru.pe
 '''
 import FreeCADGui as Gui
-#from Ventanas import Example
 from mi_ventana import Principal
 
 class Ph_Wifi():
     def GetResources(self):
-        return {"MenuText": "WIFI",
+        return {"MenuText": "&WIFI",
                        "Accel": "Ctrl+N",
                        "ToolTip": "Iniciar dispositivo por WIFI",
                        "Pixmap"  : ""

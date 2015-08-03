@@ -14,7 +14,7 @@ class Ph_Configuracion(object):
     '''
         
     def GetResources(self):
-        return {"MenuText": "Configuracion",
+        return {"MenuText": "&Configuracion",
                        "Accel": "Ctrl+O",
                        "ToolTip": "Configuraciones Avanzadas",
                        "Pixmap"  : ""

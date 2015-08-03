@@ -40,8 +40,8 @@ class PhuruWorkbench ( Workbench ):
 		from Avanzado import Configuracion
 		self.appendToolbar("PHURU", ["USB_Tool"])
 		self.appendToolbar("PHURU", ["WIFI_Tool"])
-		self.appendMenu(["PHURU", "Conectividad"], ["WIFI_Tool", "USB_Tool"])
-		self.appendMenu(["PHURU", "Avanzado ..."], ["Separator", "Configuracion"])
+		self.appendMenu(["PHURU", "&Conectividad"], ["WIFI_Tool", "USB_Tool"])
+		self.appendMenu(["PHURU", "&Avanzado"], ["Separator", "Configuracion"])
 
 	def GetClassName(self):
 		#return "PhuruGui::Workbench"
