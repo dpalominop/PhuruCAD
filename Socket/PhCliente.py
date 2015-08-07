@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 30/7/2015
 
@@ -5,71 +6,96 @@ Created on 30/7/2015
 @contact: dpalomino@phuru.pe
 '''
 
+from PyQt4.QtCore import QTimer, pyqtSignal, QCoreApplication
+from PyQt4 import QtCore
 import sys
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtNetwork import *
-from operator import xor
-import binascii
+from PyQt4.QtNetwork import QTcpSocket
+#import functools
 
-PORTS = (9998, 9999)
+MAX_WAIT_LEN  = 8
 PORT = 2323
 IP_NUMBER = "192.168.4.1"
-SIZEOF_UINT32 = 4
 
-def bin2int(b):
-    return int(binascii.hexlify(b), 16)
-    #return int(b,2)
+#def bytesToInt(b):
+#    return ord(b[0])*256*256 + ord(b[1])*256 + ord(b[2])
 
-def bin2string(b):
-    return binascii.hexlify(b)
+#def intToBytes(i):   
+#    return ""
 
-class PhCliente(QObject):
+def encodeData(data):
+    msg = "$PHURU$"+data["LEN"]+data["ID"]+data["CMD"]+data["PAYLOAD"]+data["XOR"]
+    return msg
 
+def decodeData(data):
+    return {"CAB": data[0:7], "LEN": ord(data[7]),
+             "ID": ord(data[8]), "CMD": data[9],
+             "PAYLOAD": data[10:len(data)-1],
+             "XOR": data[len(data)-1]}
+
+
+class PhCliente(QTcpSocket):
+    data_ready = pyqtSignal(unicode)
     def __init__(self):
-        super(QObject, self).__init__()
-        # Initialize socket
-        self.socket = QTcpSocket()
-        self.my_xor = 0
-        self.lastError = QString()
+        QTcpSocket.__init__(self)
+        self.wait_len = ''
+        self.temp = ''
+        #self.setSocketOption(QTcpSocket.KeepAliveOption, QVariant(1))
+        #self.readyRead.connect(self.on_ready_read)
+        self.connected.connect(self.on_connected)
+        self.disconnected.connect(self.on_disconnect)
+        self.error.connect(self.on_error)
+        self.data_ready.connect(self.print_command)
 
-        self.socket.disconnected.connect(self.serverHasStopped)
-        #self.socket.connect(self.serverHasError, SIGNAL("error(QAbstractSocket::SocketError)"))
-        #self.connect(self.socket,SIGNAL("error(QAbstractSocket::SocketError)"),self.serverHasError)
+    def connectToHost(self, host, port):
+        print 'connectToHost'
+        self.temp = ''
+        self.wait_len = ''
+        QTcpSocket.abort(self)
+        QTcpSocket.connectToHost(self, host, port)
 
-    # Create connection to server
-    def connectToServer(self):
-        self.socket.connectToHost(IP_NUMBER, PORT)
-        if(self.socket.waitForConnected(1000)):
-            qDebug("Connected!")
+    def close(self):
+        print 'close!'
+        self.disconnectFromHost()
 
-    def sendToServer(self, comando, idd):
-        self.request = QByteArray()
-        stream = QDataStream(self.request, QIODevice.WriteOnly)
-        stream.setVersion(QDataStream.Qt_4_2)
-        
-        self.my_xor = xor(idd, comando)
-        stream.writeRawData("$PHURU$")
-        stream.writeRawData("\0\0\0")
-        stream.writeRawData(chr(idd))
-        stream.writeRawData(chr(comando))
-        stream.writeRawData(chr(self.my_xor))
-        
-        self.socket.write(self.request)
+    def send(self, data):
+        self.writeData('%s|%s' % (len(data), data))
+    
+    def on_ready_read(self):
+        if self.bytesAvailable():
+            data = str(self.readAll())
+            
+            print "data: ", data
 
-    def readFromServer(self):
-        
-        stream = QDataStream(self.socket)
-        stream.setVersion(QDataStream.Qt_4_8)
+    def print_command(self,data):
+        print 'data!'
 
-        while True:
-            print "datos: "
-            print stream.readRawData(1024)
-        #print "data: ", self.data
+    def get_sstate(self):
+        print "STATE: ", self.state()
 
-    def serverHasStopped(self):
-        self.socket.close()
+    def on_error(self):
+        print 'error', self.errorString()
+        #self.close()
+        #self.connectToHost(IP_NUMBER, PORT)
+        #QTimer.singleShot(3000, functools.partial(self.connectToHost, IP_NUMBER, PORT))
+        QtCore.QMetaObject.invokeMethod(self, 'do_reconnect',  QtCore.Qt.QueuedConnection)
 
-    def serverHasError(self):
-        self.lastError = QString("Error: {}".format(self.socket.errorString()))
-        self.socket.close()
+    @QtCore.pyqtSlot()
+    def do_reconnect(self):
+        print 'Trying to reconnect'
+        self.connectToHost(IP_NUMBER, PORT)
+
+    def on_disconnect(self):
+        print 'disconnected!'
+
+    def on_connected(self):
+        print 'connected!'
+
+if __name__ == "__main__":
+    app = QCoreApplication(sys.argv)
+    main_socket = PhCliente()
+    state_timer = QTimer()
+    state_timer.setInterval(1000)
+    state_timer.timeout.connect(main_socket.get_sstate)
+    state_timer.start()
+    main_socket.connectToHost(IP_NUMBER, PORT)
+    sys.exit(app.exec_())
