@@ -5,7 +5,9 @@ Created on 23/7/2015
 @contact: dpalomino@phuru.pe
 '''
 import FreeCADGui as Gui
-from mi_ventana import Principal
+#from mi_ventana import Principal
+from Socket.PhThread import *
+from PyQt4.QtCore import QThread
 
 class Ph_Wifi():
     def GetResources(self):
@@ -20,6 +22,16 @@ class Ph_Wifi():
 
     def Activated(self):
         #self.ex = Example()
-        self.principal = Principal()
+        #self.principal = Principal()
+        #from Socket.PhCliente import *
+        
+        self.proceso()
+        
+    def proceso(self):
+        
+        myThread = QThread()
+        
+        myThread.start()
+        
 
 Gui.addCommand('WIFI_Tool', Ph_Wifi())
