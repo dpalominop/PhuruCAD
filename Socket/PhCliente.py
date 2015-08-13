@@ -10,7 +10,6 @@ from PyQt4.QtCore import QTimer, pyqtSignal, QCoreApplication
 from PyQt4 import QtCore
 import sys
 from PyQt4.QtNetwork import QTcpSocket
-#import functools
 
 MAX_WAIT_LEN  = 8
 PORT = 23
@@ -27,7 +26,7 @@ def decodeData(data):
              "PAYLOAD": data[10:len(data)-1],
              "XOR": data[len(data)-1]}
 
-est = {"cabecera": 0, "longitud": 1, "device": 2, "comando": 3, "payload": 4, "xor": 5}
+# est = {"HEADER": 0, "LENGTH": 1, "DEVICE": 2, "COMMAND": 3, "PAYLOAD": 4, "XOR": 5}
 
 class PhCliente(QTcpSocket):
     data_ready = pyqtSignal(unicode)
@@ -42,8 +41,6 @@ class PhCliente(QTcpSocket):
         self.disconnected.connect(self.on_disconnect)
         self.error.connect(self.on_error)
         self.data_ready.connect(self.print_command)
-        
-        self.estado = est["cabecera"]
 
     def connectToHost(self, host, port):
         print 'connectToHost'
@@ -62,9 +59,13 @@ class PhCliente(QTcpSocket):
     
     def on_ready_read(self):
         if self.bytesAvailable():
-            self.data = str(self.readAll())
+            data = str(self.readAll())
             
             print "data: ", self.data
+            
+            return data
+        else:
+            return ""
 
     def print_command(self,data):
         print 'data!'
@@ -95,16 +96,49 @@ class PhCliente(QTcpSocket):
         snd_msg, self.xor = encodeData(dev_id, cmd, payload)
         self.send(snd_msg)
         
-        rcv_msg = ""
+        estado = "HEADER"
+        rheader = ""
+        rlen = 0
+        rxor = ""
+        rdata = ""
+        
         complete = False
         while not complete:
             if self.waitForReadyRead(msecs=3000):
-                self.on_ready_read()
-                if len(self.data)>=7:
-                    pass
+                
+                for c in self.on_ready_read():
+                    
+                    if self.estado == "HEADER":
+                        rheader = rheader + c
+                        if len(rheader)==7: 
+                            if rheader=="$PHURU$":
+                                self.estado = "LENGTH"
+                            else:
+                                rheader = rheader[1:]
+                            
+                    elif estado == "LENGTH":
+                        rlen = ord(c)
+                        estado = "DEVICE"
+                        
+                    elif estado == "DEVICE":
+                        estado = "COMMAND"
+                        
+                    elif estado == "COMMAND":
+                        estado = "PAYLOAD"
+                        
+                    elif estado == "PAYLOAD":
+                        rdata = rdata + c
+                        if len(rdata) == rlen:
+                            estado = "XOR"
+                            
+                    elif estado == "XOR":
+                        rxor = c
+                        complete = True
+                
             else:
                 print "ERORR: TRANSFER FAILED"
-                self.data = ""
+        
+        return rdata
         
 
 if __name__ == "__main__":
