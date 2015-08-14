@@ -6,7 +6,7 @@ Created on 30/7/2015
 @contact: dpalomino@phuru.pe
 '''
 
-from PyQt4.QtCore import QTimer, pyqtSignal, QCoreApplication
+from PyQt4.QtCore import QTimer, pyqtSignal, QCoreApplication, QVariant
 from PyQt4 import QtCore
 import sys
 from PyQt4.QtNetwork import QTcpSocket
@@ -20,62 +20,143 @@ def encodeData(dev_id, cmd, payload):
     msg = "$PHURU$"+chr(len(payload))+chr(dev_id)+chr(cmd)+payload+my_xor
     return msg, my_xor
 
-def decodeData(data):
-    return {"CAB": data[0:7], "LEN": ord(data[7]),
-             "ID": ord(data[8]), "CMD": data[9],
-             "PAYLOAD": data[10:len(data)-1],
-             "XOR": data[len(data)-1]}
+def decodeData(data, rcv_msg):
+    
+# ESTADOS:   "HEADER":    0, 
+#            "LENGTH":    1, 
+#            "DEVICE":    2, 
+#            "COMMAND":    3, 
+#            "PAYLOAD":    4, 
+#            "XOR":        5, 
+#            "COMPLETE":    6}
 
-# est = {"HEADER": 0, "LENGTH": 1, "DEVICE": 2, "COMMAND": 3, "PAYLOAD": 4, "XOR": 5}
+    for c in data:
+        if rcv_msg["restado"] == "HEADER":
+            rcv_msg["rheader"] = rcv_msg["rheader"] + c
+            if len(rcv_msg["rheader"])==7:
+                if rcv_msg["rheader"]=="$PHURU$":
+                    rcv_msg["restado"] = "LENGTH"
+                else:
+                    rcv_msg["rheader"] = rcv_msg["rheader"][1:]
+                
+        elif rcv_msg["restado"] == "LENGTH":
+            rcv_msg["rlen"] = ord(c)
+            rcv_msg["restado"] = "DEVICE"
+            
+        elif rcv_msg["restado"] == "DEVICE":
+            rcv_msg["rdevice"] = ord(c)
+            rcv_msg["restado"] = "COMMAND"
+            
+        elif rcv_msg["restado"] == "COMMAND":
+            rcv_msg["rcmd"] = ord(c)
+            if rcv_msg["rlen"] == 2:
+                rcv_msg["restado"] = "XOR"
+            else:
+                rcv_msg["restado"] = "PAYLOAD"
+            
+        elif rcv_msg["restado"] == "PAYLOAD":
+            rcv_msg["rdata"] = rcv_msg["rdata"] + c
+            if len(rcv_msg["rdata"]) == (rcv_msg["rdata"]-2):
+                rcv_msg["restado"] = "XOR"
+                
+        elif rcv_msg["restado"] == "XOR":
+            rcv_msg["rxor"] = c
+            rcv_msg["restado"] = "COMPLETE"
+
+
+def socketStateToString(num):
+    if num == 0:
+        return "UnconnectedState"
+    elif num == 1:
+        return "HostLookupState"
+    elif num == 2:
+        return "ConnectingState"
+    elif num == 3:
+        return "ConnectedState"
+    elif num == 4:
+        return "BoundState"
+    elif num == 5:
+        return "ListeningState"
+    elif num == 6:
+        return "ClosingState"
 
 class PhCliente(QTcpSocket):
     data_ready = pyqtSignal(unicode)
     
     def __init__(self):
         QTcpSocket.__init__(self)
-        self.wait_len = ''
-        self.temp = ''
-        #self.setSocketOption(QTcpSocket.KeepAliveOption, QVariant(1))
+        self.setSocketOption(QTcpSocket.KeepAliveOption, QVariant(1))
         #self.readyRead.connect(self.on_ready_read)
-        #self.connected.connect(self.on_connected)
+        self.connected.connect(self.on_connected)
         self.disconnected.connect(self.on_disconnect)
         self.error.connect(self.on_error)
         self.data_ready.connect(self.print_command)
 
     def connectToHost(self, host, port):
         print 'connectToHost'
-        self.temp = ''
-        self.wait_len = ''
         QTcpSocket.abort(self)
-        
         QTcpSocket.connectToHost(self, host, port)
 
     def close(self):
         print 'close!'
         self.disconnectFromHost()
 
-    def send(self, data):
-        self.writeData('%s' % data)
     
     def on_ready_read(self):
         if self.bytesAvailable():
-            data = str(self.readAll())
-            
-            print "data: ", data
-            
-            return data
+            print 'read!'
+            return str(self.readAll())
         else:
             return ""
+        
+    def sendData(self, data):
+        print 'write!'
+        self.writeData('%s' % data)
 
+    def receiveData(self):
+        print 'read!'
+        return str(self.readAll())
+    
+    def sendCommand(self, dev_id, cmd, payload):
+        
+        snd_msg, self.xor = encodeData(dev_id, cmd, payload)
+        self.send(snd_msg)
+        
+        rcv_msg = {
+        "estado"    : "HEADER",
+        "rheader"   : "",
+        "rlen"      : 0,
+        "rxor"      : "",
+        "rdata"     : "",
+        "rdevice"   : 0,
+        "rcmd"      : 0
+        }
+        
+        cont = 0
+        while not rcv_msg["COMPLETE"]:
+            if self.waitForReadyRead(msecs=1000):
+                decodeData(self.on_ready_read(), rcv_msg)
+            else:
+                cont = cont +1
+                if cont == 3:
+                    print "ERROR: NONE DATA"
+                    rcv_msg["COMPLETE"] = True
+
+        print rcv_msg
+        return rcv_msg
+    
+    @QtCore.pyqtSlot()
     def print_command(self, data):
         print 'data!'
-
+        
+    @QtCore.pyqtSlot()
     def get_sstate(self):
-        print "STATE: ", self.state()
-
+        print "SOCKET STATE: ", socketStateToString(self.state())
+        
+    @QtCore.pyqtSlot()
     def on_error(self):
         print 'error', self.errorString()
-        #self.close()
+        self.close()
         #self.connectToHost(IP_NUMBER, PORT)
         #QTimer.singleShot(3000, functools.partial(self.connectToHost, IP_NUMBER, PORT))
         QtCore.QMetaObject.invokeMethod(self, 'do_reconnect',  QtCore.Qt.QueuedConnection)
@@ -84,73 +165,14 @@ class PhCliente(QTcpSocket):
     def do_reconnect(self):
         print 'Trying to reconnect'
         self.connectToHost(IP_NUMBER, PORT)
-
+        
+    @QtCore.pyqtSlot()
     def on_disconnect(self):
         print 'disconnected!'
-
+        
+    @QtCore.pyqtSlot()
     def on_connected(self):
         print 'connected!'
-        
-    def sendReceive(self, dev_id, cmd, payload):
-        
-        snd_msg, self.xor = encodeData(dev_id, cmd, payload)
-        self.send(snd_msg)
-        
-        estado = "HEADER"
-        rheader = ""
-        rlen = 0
-        rxor = ""
-        rdata = ""
-        rdevice = 0
-        rcmd = 0
-        
-        complete = False
-        cont = 0
-        while not complete:
-            if self.waitForReadyRead(msecs=1000):
-                for c in self.on_ready_read():
-                    if estado == "HEADER":
-                        rheader = rheader + c
-                        if len(rheader)==7: 
-                            if rheader=="$PHURU$":
-                                estado = "LENGTH"
-                            else:
-                                rheader = rheader[1:]
-                            
-                    elif estado == "LENGTH":
-                        rlen = ord(c)
-                        estado = "DEVICE"
-                        
-                    elif estado == "DEVICE":
-                        rdevice = ord(c)
-                        estado = "COMMAND"
-                        
-                    elif estado == "COMMAND":
-                        rcmd = ord(c)
-                        if rlen == 2:
-                            estado = "XOR"
-                        else:
-                            estado = "PAYLOAD"
-                        
-                    elif estado == "PAYLOAD":
-                        rdata = rdata + c
-                        if len(rdata) == (rlen-2):
-                            estado = "XOR"
-                            
-                    elif estado == "XOR":
-                        rxor = c
-                        complete = True
-                
-            else:
-                print "ERORR: TRANSFER FAILED"
-                cont = cont +1
-                if cont == 3:
-                    print "ERROR: NONE DATA"
-                    complete = True
-        
-        print "received: rheader, rlen, rdevice, rcmd, rdata, rxor"
-        print (rheader, rlen, rdevice, rcmd, rdata, rxor)
-        return (rheader, rlen, rdevice, rcmd, rdata, rxor)
         
 
 if __name__ == "__main__":
@@ -161,6 +183,6 @@ if __name__ == "__main__":
     state_timer.timeout.connect(main_socket.get_sstate)
     state_timer.start()
     main_socket.connectToHost(IP_NUMBER, PORT)
-    main_socket.sendReceive(1, 1, "cucharos")
+    main_socket.sendCommand(1, 1, "CUCHAROS")
     sys.exit(app.exec_())
     
