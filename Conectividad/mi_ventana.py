@@ -7,10 +7,10 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
+from PySide import QtCore, QtGui
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
+    
 except AttributeError:
     def _fromUtf8(s):
         return s
@@ -93,8 +93,9 @@ class Principal(QtGui.QStackedWidget):
         self.addWidget(self.SegundaPagina)
 
         self.retranslateUi()
+       
         #QtCore.QMetaObject.connectSlotsByName(Principal)
-        QtCore.QObject.connect(self.PrimerSiguiente, QtCore.SIGNAL("pressed()"), self.segundaVentana)
+        #QtCore.QObject.connect(self.PrimerSiguiente, QtCore.SIGNAL("pressed()"), self.segundaVentana)
         QtCore.QObject.connect(self.PrimerCancelar, QtCore.SIGNAL("pressed()"), self.cancelar)
         QtCore.QObject.connect(self.PrimerAceptar, QtCore.SIGNAL("pressed()"), self.aceptar)
         
@@ -124,7 +125,8 @@ class Principal(QtGui.QStackedWidget):
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#55aa7f;\">de lo contrario presione &quot;Aceptar&quot;</span></p></body></html>", None))
         self.PrimerAceptar.setText(_translate("Principal", "Aceptar", None))
         self.Router.setText(_translate("Principal", "Router", None))
-        
+    
+    @QtCore.pyqtSlot()
     def segundaVentana(self):
         self.PrimeraPagina.setVisible(False)
         self.PrimeraPagina.setEnabled(False)

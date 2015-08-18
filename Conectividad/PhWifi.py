@@ -5,9 +5,8 @@ Created on 23/7/2015
 @contact: dpalomino@phuru.pe
 '''
 import FreeCADGui as Gui
-#from mi_ventana import Principal
-from Socket.PhThread import *
-from PyQt4.QtCore import QThread
+from mi_ventana import Principal
+from Socket.PhCliente import *
 
 class Ph_Wifi():
     def GetResources(self):
@@ -21,17 +20,24 @@ class Ph_Wifi():
         return True
 
     def Activated(self):
-        #self.ex = Example()
-        #self.principal = Principal()
-        #from Socket.PhCliente import *
+        #app = QtCore.QCoreApplication(sys.argv)
+        self.socket = PhCliente()
+        self.principal = Principal()
+        
+        QtCore.QObject.connect(self.principal.PrimerSiguiente, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self.socket, 
+                               QtCore.SLOT("do_reconnect()"))
+        
+        QtCore.QObject.connect(self.socket,
+                               QtCore.SIGNAL("connected()"),
+                               self.principal,
+                               QtCore.SLOT("segundaVentana()"))
         
         self.proceso()
         
     def proceso(self):
-        
-        myThread = QThread()
-        
-        myThread.start()
+        self.socket.sendCommand(1, 1, "CUCHAROS")
         
 
 Gui.addCommand('WIFI_Tool', Ph_Wifi())

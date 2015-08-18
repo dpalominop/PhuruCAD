@@ -3,13 +3,12 @@
 Created on 30/7/2015
 
 @author: Daniel Palomino
-@contact: dpalomino@phuru.pe
+@contact: dpalomino@phuru.io
 '''
 
-from PyQt4.QtCore import QTimer, pyqtSignal, QCoreApplication, QVariant
-from PyQt4 import QtCore
 import sys
-from PyQt4.QtNetwork import QTcpSocket
+from PySide import QtCore
+from PySide.QtNetwork import QTcpSocket
 
 MAX_WAIT_LEN  = 8
 PORT = 2323
@@ -56,7 +55,7 @@ def decodeData(data, rcv_msg):
             
         elif rcv_msg["restado"] == "PAYLOAD":
             rcv_msg["rdata"] = rcv_msg["rdata"] + c
-            if len(rcv_msg["rdata"]) == (rcv_msg["rdata"]-2):
+            if len(rcv_msg["rdata"]) == (rcv_msg["rlen"]-2):
                 rcv_msg["restado"] = "XOR"
                 
         elif rcv_msg["restado"] == "XOR":
@@ -81,13 +80,13 @@ def socketStateToString(num):
         return "ClosingState"
 
 class PhCliente(QTcpSocket):
-    data_ready = pyqtSignal(unicode)
+    data_ready = QtCore.Signal(unicode)
     
     def __init__(self):
         QTcpSocket.__init__(self)
-        self.setSocketOption(QTcpSocket.KeepAliveOption, QVariant(1))
+        self.setSocketOption(QTcpSocket.KeepAliveOption, 1)
         #self.readyRead.connect(self.on_ready_read)
-        self.connected.connect(self.on_connected)
+        #self.connected.connect(self.on_connected)
         self.disconnected.connect(self.on_disconnect)
         self.error.connect(self.on_error)
         self.data_ready.connect(self.print_command)
@@ -120,10 +119,10 @@ class PhCliente(QTcpSocket):
     def sendCommand(self, dev_id, cmd, payload):
         
         snd_msg, self.xor = encodeData(dev_id, cmd, payload)
-        self.send(snd_msg)
+        self.sendData(snd_msg)
         
         rcv_msg = {
-        "estado"    : "HEADER",
+        "restado"    : "HEADER",
         "rheader"   : "",
         "rlen"      : 0,
         "rxor"      : "",
@@ -133,14 +132,14 @@ class PhCliente(QTcpSocket):
         }
         
         cont = 0
-        while not rcv_msg["COMPLETE"]:
+        while rcv_msg["restado"] != "COMPLETE":
             if self.waitForReadyRead(msecs=1000):
                 decodeData(self.on_ready_read(), rcv_msg)
             else:
                 cont = cont +1
                 if cont == 3:
                     print "ERROR: NONE DATA"
-                    rcv_msg["COMPLETE"] = True
+                    rcv_msg["restado"] = "COMPLETE"
 
         print rcv_msg
         return rcv_msg
@@ -176,9 +175,9 @@ class PhCliente(QTcpSocket):
         
 
 if __name__ == "__main__":
-    app = QCoreApplication(sys.argv)
+    app = QtCore.QCoreApplication(sys.argv)
     main_socket = PhCliente()
-    state_timer = QTimer()
+    state_timer = QtCore.QTimer()
     state_timer.setInterval(1000)
     state_timer.timeout.connect(main_socket.get_sstate)
     state_timer.start()
