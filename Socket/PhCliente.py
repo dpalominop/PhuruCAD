@@ -15,8 +15,14 @@ PORT = 2323
 IP_NUMBER = "192.168.4.1"
 
 def encodeData(dev_id, cmd, payload):
-    my_xor = chr(64)
-    msg = "$PHURU$"+chr(len(payload))+chr(dev_id)+chr(cmd)+payload+my_xor
+    """
+    Calculate xor 
+    """
+    my_xor = 0x00
+    msg = chr(len(payload))+chr(dev_id)+chr(cmd)+payload
+    for ch in msg:
+	   my_xor^=ord(ch)
+    msg = "$PHURU$" + msg + chr(my_xor)
     return msg, my_xor
 
 def decodeData(data, rcv_msg):
