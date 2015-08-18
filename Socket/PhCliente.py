@@ -110,7 +110,7 @@ class PhCliente(QTcpSocket):
         
     def sendData(self, data):
         print 'write!'
-        self.writeData('%s' % data)
+        self.writeData('%s' % data, len(data))
 
     def receiveData(self):
         print 'read!'
@@ -144,15 +144,15 @@ class PhCliente(QTcpSocket):
         print rcv_msg
         return rcv_msg
     
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def print_command(self, data):
         print 'data!'
         
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def get_sstate(self):
         print "SOCKET STATE: ", socketStateToString(self.state())
         
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def on_error(self):
         print 'error', self.errorString()
         self.close()
@@ -160,16 +160,16 @@ class PhCliente(QTcpSocket):
         #QTimer.singleShot(3000, functools.partial(self.connectToHost, IP_NUMBER, PORT))
         QtCore.QMetaObject.invokeMethod(self, 'do_reconnect',  QtCore.Qt.QueuedConnection)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def do_reconnect(self):
         print 'Trying to reconnect'
         self.connectToHost(IP_NUMBER, PORT)
         
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def on_disconnect(self):
         print 'disconnected!'
         
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def on_connected(self):
         print 'connected!'
         
