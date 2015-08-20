@@ -6,6 +6,7 @@ Created on 23/7/2015
 '''
 import FreeCADGui as Gui
 from mi_ventana import Principal
+#from mi_ventana_pyside import Principal
 from Socket.PhCliente import *
 
 class Ph_Wifi():

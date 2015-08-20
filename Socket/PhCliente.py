@@ -9,6 +9,7 @@ Created on 30/7/2015
 import sys
 from PySide import QtCore
 from PySide.QtNetwork import QTcpSocket
+import struct
 
 MAX_WAIT_LEN  = 8
 PORT = 2323
@@ -21,7 +22,7 @@ def encodeData(dev_id, cmd, payload):
     my_xor = 0x00
     msg = chr(len(payload))+chr(dev_id)+chr(cmd)+payload
     for ch in msg:
-	   my_xor^=ord(ch)
+        my_xor^=ord(ch)
     msg = "$PHURU$" + msg + chr(my_xor)
     return msg, my_xor
 
@@ -92,13 +93,13 @@ class PhCliente(QTcpSocket):
         QTcpSocket.__init__(self)
         self.setSocketOption(QTcpSocket.KeepAliveOption, 1)
         #self.readyRead.connect(self.on_ready_read)
-        #self.connected.connect(self.on_connected)
+        self.connected.connect(self.on_connected)
         self.disconnected.connect(self.on_disconnect)
         self.error.connect(self.on_error)
         self.data_ready.connect(self.print_command)
 
     def connectToHost(self, host, port):
-        print 'connectToHost'
+        print 'connectingToHost'
         QTcpSocket.abort(self)
         QTcpSocket.connectToHost(self, host, port)
 
@@ -145,8 +146,16 @@ class PhCliente(QTcpSocket):
                 cont = cont +1
                 if cont == 3:
                     print "ERROR: NONE DATA"
-                    rcv_msg["restado"] = "COMPLETE"
+                    break
+                    #rcv_msg["restado"] = "COMPLETE"
 
+        if rcv_msg["restado"] == "COMPLETE":
+            rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
+                                struct.unpack('f', rcv_msg["rdata"][4:8])[0],
+                                struct.unpack('f', rcv_msg["rdata"][8:12])[0],
+                                struct.unpack('f', rcv_msg["rdata"][12:])[0]]
+            
+            
         print rcv_msg
         return rcv_msg
     
@@ -183,11 +192,11 @@ class PhCliente(QTcpSocket):
 if __name__ == "__main__":
     app = QtCore.QCoreApplication(sys.argv)
     main_socket = PhCliente()
-    state_timer = QtCore.QTimer()
-    state_timer.setInterval(1000)
-    state_timer.timeout.connect(main_socket.get_sstate)
-    state_timer.start()
+    #state_timer = QtCore.QTimer()
+    #state_timer.setInterval(1000)
+    #state_timer.timeout.connect(main_socket.get_sstate)
+    #state_timer.start()
     main_socket.connectToHost(IP_NUMBER, PORT)
-    main_socket.sendCommand(1, 1, "CUCHAROS")
+    main_socket.sendCommand(1, 4, "CUCHAROS")
     sys.exit(app.exec_())
     

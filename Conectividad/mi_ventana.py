@@ -8,12 +8,6 @@
 # WARNING! All changes made in this file will be lost!
 
 from PySide import QtCore, QtGui
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-    
-except AttributeError:
-    def _fromUtf8(s):
-        return s
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
@@ -30,7 +24,7 @@ class Principal(QtGui.QStackedWidget):
         self.show()
     
     def setupUi(self):
-        self.setObjectName(_fromUtf8("Principal"))
+        self.setObjectName("Principal")
         self.resize(421, 270)
         self.setMinimumSize(QtCore.QSize(421, 270))
         self.setMaximumSize(QtCore.QSize(421, 270))
@@ -39,27 +33,28 @@ class Principal(QtGui.QStackedWidget):
         self.PrimeraPagina.setEnabled(True)
         self.PrimeraPagina.setMinimumSize(QtCore.QSize(421, 270))
         self.PrimeraPagina.setMaximumSize(QtCore.QSize(421, 270))
-        self.PrimeraPagina.setObjectName(_fromUtf8("PrimeraPagina"))
+        self.PrimeraPagina.setObjectName("PrimeraPagina")
         
         self.formLayoutWidget = QtGui.QWidget(self.PrimeraPagina)
         self.formLayoutWidget.setGeometry(QtCore.QRect(-1, -1, 421, 271))
-        self.formLayoutWidget.setObjectName(_fromUtf8("formLayoutWidget"))
+        self.formLayoutWidget.setObjectName("formLayoutWidget")
         
         self.PrimerLayout = QtGui.QFormLayout(self.formLayoutWidget)
         self.PrimerLayout.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
-        self.PrimerLayout.setMargin(0)
-        self.PrimerLayout.setObjectName(_fromUtf8("PrimerLayout"))
+        #self.PrimerLayout.setMargin(0)
+        self.PrimerLayout.setContentsMargins(0, 0, 0, 0)
+        self.PrimerLayout.setObjectName("PrimerLayout")
         
         self.PrimerTexto = QtGui.QTextBrowser(self.formLayoutWidget)
-        self.PrimerTexto.setObjectName(_fromUtf8("PrimerTexto"))
+        self.PrimerTexto.setObjectName("PrimerTexto")
         self.PrimerLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.PrimerTexto)
         
         self.PrimerSiguiente = QtGui.QPushButton(self.formLayoutWidget)
-        self.PrimerSiguiente.setObjectName(_fromUtf8("PrimerSiguiente"))
+        self.PrimerSiguiente.setObjectName("PrimerSiguiente")
         self.PrimerLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.PrimerSiguiente)
         
         self.PrimerCancelar = QtGui.QPushButton(self.formLayoutWidget)
-        self.PrimerCancelar.setObjectName(_fromUtf8("PrimerCancelar"))
+        self.PrimerCancelar.setObjectName("PrimerCancelar")
         self.PrimerLayout.setWidget(2, QtGui.QFormLayout.FieldRole, self.PrimerCancelar)
         self.addWidget(self.PrimeraPagina)
         
@@ -68,26 +63,26 @@ class Principal(QtGui.QStackedWidget):
         self.SegundaPagina.setEnabled(False)
         self.SegundaPagina.setMinimumSize(QtCore.QSize(421, 270))
         self.SegundaPagina.setMaximumSize(QtCore.QSize(421, 270))
-        self.SegundaPagina.setObjectName(_fromUtf8("SegundaPagina"))
+        self.SegundaPagina.setObjectName("SegundaPagina")
         
         self.formLayoutWidget_2 = QtGui.QWidget(self.SegundaPagina)
         self.formLayoutWidget_2.setGeometry(QtCore.QRect(0, 0, 421, 271))
-        self.formLayoutWidget_2.setObjectName(_fromUtf8("formLayoutWidget_2"))
+        self.formLayoutWidget_2.setObjectName("formLayoutWidget_2")
         
         self.SegundoLayout = QtGui.QFormLayout(self.formLayoutWidget_2)
-        self.SegundoLayout.setMargin(0)
-        self.SegundoLayout.setObjectName(_fromUtf8("SegundoLayout"))
+        self.SegundoLayout.setContentsMargins(0, 0, 0, 0)
+        self.SegundoLayout.setObjectName("SegundoLayout")
         
         self.SegundoTexto = QtGui.QTextBrowser(self.formLayoutWidget_2)
-        self.SegundoTexto.setObjectName(_fromUtf8("SegundoTexto"))
+        self.SegundoTexto.setObjectName("SegundoTexto")
         self.SegundoLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.SegundoTexto)
         
         self.PrimerAceptar = QtGui.QPushButton(self.formLayoutWidget_2)
-        self.PrimerAceptar.setObjectName(_fromUtf8("PrimerAceptar"))
+        self.PrimerAceptar.setObjectName("PrimerAceptar")
         self.SegundoLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.PrimerAceptar)
         
         self.Router = QtGui.QPushButton(self.formLayoutWidget_2)
-        self.Router.setObjectName(_fromUtf8("Router"))
+        self.Router.setObjectName("Router")
         self.SegundoLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.Router)
         
         self.addWidget(self.SegundaPagina)
@@ -95,7 +90,7 @@ class Principal(QtGui.QStackedWidget):
         self.retranslateUi()
        
         #QtCore.QMetaObject.connectSlotsByName(Principal)
-        #QtCore.QObject.connect(self.PrimerSiguiente, QtCore.SIGNAL("pressed()"), self.segundaVentana)
+        QtCore.QObject.connect(self.PrimerSiguiente, QtCore.SIGNAL("pressed()"), self.segundaVentana)
         QtCore.QObject.connect(self.PrimerCancelar, QtCore.SIGNAL("pressed()"), self.cancelar)
         QtCore.QObject.connect(self.PrimerAceptar, QtCore.SIGNAL("pressed()"), self.aceptar)
         
@@ -126,7 +121,7 @@ class Principal(QtGui.QStackedWidget):
         self.PrimerAceptar.setText(_translate("Principal", "Aceptar", None))
         self.Router.setText(_translate("Principal", "Router", None))
     
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def segundaVentana(self):
         self.PrimeraPagina.setVisible(False)
         self.PrimeraPagina.setEnabled(False)
