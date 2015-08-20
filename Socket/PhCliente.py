@@ -20,7 +20,7 @@ def encodeData(dev_id, cmd, payload):
     Calculate xor 
     """
     my_xor = 0x00
-    msg = chr(len(payload))+chr(dev_id)+chr(cmd)+payload
+    msg = chr(len(payload)+2)+chr(dev_id)+chr(cmd)+payload ## 2 is by id and cmd
     for ch in msg:
         my_xor^=ord(ch)
     msg = "$PHURU$" + msg + chr(my_xor)
