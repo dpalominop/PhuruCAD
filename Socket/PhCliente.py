@@ -104,19 +104,27 @@ class PhCliente(QTcpSocket):
         QTcpSocket.__init__(self)
         self.setSocketOption(QTcpSocket.KeepAliveOption, 1)
         #self.readyRead.connect(self.on_ready_read)
-        self.connected.connect(self.on_connected)
-        self.disconnected.connect(self.on_disconnect)
+        #self.connected.connect(self.on_connected)
+        #self.disconnected.connect(self.on_disconnect)
         self.error.connect(self.on_error)
         self.data_ready.connect(self.print_command)
 
     def connectToHost(self, host, port):
         print 'connectingToHost'
-        QTcpSocket.abort(self)
+        #QTcpSocket.abort(self)
         QTcpSocket.connectToHost(self, host, port)
+        if QTcpSocket.waitForConnected(self, 1000):
+            print "Connected OK"
+        else:
+            print "Fail Connection!"
 
     def close(self):
         print 'close!'
         self.disconnectFromHost()
+        if self.waitForDisconnected(1000):
+            print "SOCKET DISCONNTED!"
+        else:
+            print " ERROR IN SOCKET DISCONNTING PROCESS!"
 
     
     def on_ready_read(self):
@@ -135,40 +143,47 @@ class PhCliente(QTcpSocket):
         return str(self.readAll())
     
     def sendCommand(self, dev_id, cmd, payload):
+        rcv_msg = {
+            "restado"    : "HEADER",
+            "rheader"   : "",
+            "rlen"      : 0,
+            "rxor"      : "",
+            "rdata"     : "",
+            "rdevice"   : 0,
+            "rcmd"      : 0,
+            "rerror"    : "",
+            "rsucces"   : True
+            }
+        
         self.connectToHost(IP_NUMBER, PORT)
         
-        self.sendData(encodeData(dev_id, cmd, payload)) 
-        
-        rcv_msg = {
-        "restado"    : "HEADER",
-        "rheader"   : "",
-        "rlen"      : 0,
-        "rxor"      : "",
-        "rdata"     : "",
-        "rdevice"   : 0,
-        "rcmd"      : 0,
-        "rerror"    : "",
-        "rsucces"   : True
-        }
-        
-        cont = 0
-        while rcv_msg["restado"] != "COMPLETE":
-            if self.waitForReadyRead(msecs=1000):
-                decodeData(self.on_ready_read(), rcv_msg)
-            else:
-                cont = cont +1
-                if cont == 3:
-                    rcv_msg["rsucces"] = False
-                    rcv_msg["rerror"] = "DATA INCOMPLETE"
-                    break
-
-        if rcv_msg["rsucces"] and (rcv_msg["rlen"] == 18):
-            rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
-                                struct.unpack('f', rcv_msg["rdata"][4:8])[0],
-                                struct.unpack('f', rcv_msg["rdata"][8:12])[0],
-                                struct.unpack('f', rcv_msg["rdata"][12:])[0]]
+        if self.isOpen():
+            self.sendData(encodeData(dev_id, cmd, payload)) 
             
-        self.close()
+            cont = 0
+            while rcv_msg["restado"] != "COMPLETE":
+                if self.waitForReadyRead(msecs=1000):
+                    decodeData(self.on_ready_read(), rcv_msg)
+                else:
+                    cont = cont +1
+                    if cont == 3:
+                        rcv_msg["rsucces"] = False
+                        rcv_msg["rerror"] = "DATA INCOMPLETE"
+                        break
+    
+            if rcv_msg["rsucces"] and (rcv_msg["rlen"] == 18):
+                rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
+                                    struct.unpack('f', rcv_msg["rdata"][4:8])[0],
+                                    struct.unpack('f', rcv_msg["rdata"][8:12])[0],
+                                    struct.unpack('f', rcv_msg["rdata"][12:])[0]]
+                
+            self.close()
+        
+        else:
+            print "SOCKET IS CLOSED!"
+            rcv_msg["rerror"] = "SOCKET IS CLOSED"
+            rcv_msg["rsucces"] = False
+        
         return rcv_msg
     
     @QtCore.Slot()
@@ -190,6 +205,7 @@ class PhCliente(QTcpSocket):
     @QtCore.Slot()
     def do_reconnect(self):
         print 'Trying to reconnect'
+        self.close()
         self.connectToHost(IP_NUMBER, PORT)
         
     @QtCore.Slot()
@@ -202,13 +218,20 @@ class PhCliente(QTcpSocket):
         
 
 if __name__ == "__main__":
-    #app = QtCore.QCoreApplication(sys.argv)
+    app = QtCore.QCoreApplication(sys.argv)
     main_socket = PhCliente()
     #state_timer = QtCore.QTimer()
     #state_timer.setInterval(1000)
     #state_timer.timeout.connect(main_socket.get_sstate)
     #state_timer.start()
     #main_socket.connectToHost(IP_NUMBER, PORT)
-    main_socket.sendCommand(1, 4, "CUCHAROS")
-    #sys.exit(app.exec_())
+    #main_socket.sendCommand(1, 4, "CUCHAROS")
+    for i in range(200):
+        main_socket.connectToHost(IP_NUMBER, PORT)
+        msg = encodeData(1, i, "LAS CUQUIS")
+        print msg
+        main_socket.sendData(msg+"\n")
+        
+        main_socket.close()
+    sys.exit(app.exec_())
     
