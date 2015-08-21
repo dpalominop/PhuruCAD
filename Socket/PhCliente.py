@@ -59,7 +59,7 @@ def decodeData(data, rcv_msg):
             
         elif rcv_msg["restado"] == "COMMAND":
             rcv_msg["rcmd"] = ord(c)
-            if rcv_msg["rlen"] == 2:
+            if rcv_msg["rlen"] <= 2:
                 rcv_msg["restado"] = "XOR"
             else:
                 rcv_msg["restado"] = "PAYLOAD"
