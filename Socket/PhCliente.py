@@ -15,16 +15,20 @@ MAX_WAIT_LEN  = 8
 PORT = 2323
 IP_NUMBER = "192.168.4.1"
 
-def encodeData(dev_id, cmd, payload):
+def genXor(msg):
     """
     Calculate xor 
     """
     my_xor = 0x00
-    msg = chr(len(payload)+2)+chr(dev_id)+chr(cmd)+payload ## 2 is by id and cmd
     for ch in msg:
         my_xor^=ord(ch)
-    msg = "$PHURU$" + msg + chr(my_xor)
-    return msg, my_xor
+        
+    return chr(my_xor)
+
+def encodeData(dev_id, cmd, payload):
+    msg = chr(len(payload)+2)+chr(dev_id)+chr(cmd)+payload ## 2 is by id and cmd
+    msg = "$PHURU$" + msg + genXor(msg)
+    return msg
 
 def decodeData(data, rcv_msg):
     
@@ -68,6 +72,10 @@ def decodeData(data, rcv_msg):
         elif rcv_msg["restado"] == "XOR":
             rcv_msg["rxor"] = c
             rcv_msg["restado"] = "COMPLETE"
+            
+            if rcv_msg["rxor"] != genXor(rcv_msg["rdata"]):
+                rcv_msg["rsucces"] = False
+                rcv_msg["rerror"] = "XOR INCORRECT"
 
 
 def socketStateToString(num):
@@ -124,9 +132,8 @@ class PhCliente(QTcpSocket):
         return str(self.readAll())
     
     def sendCommand(self, dev_id, cmd, payload):
-        
-        snd_msg, self.xor = encodeData(dev_id, cmd, payload)
-        self.sendData(snd_msg)
+        self.connectToHost(IP_NUMBER, PORT)
+        self.sendData(encodeData(dev_id, cmd, payload))
         
         rcv_msg = {
         "restado"    : "HEADER",
@@ -135,7 +142,9 @@ class PhCliente(QTcpSocket):
         "rxor"      : "",
         "rdata"     : "",
         "rdevice"   : 0,
-        "rcmd"      : 0
+        "rcmd"      : 0,
+        "rerror"    : "",
+        "rsucces"   : True
         }
         
         cont = 0
@@ -145,16 +154,15 @@ class PhCliente(QTcpSocket):
             else:
                 cont = cont +1
                 if cont == 3:
-                    print "ERROR: NONE DATA"
+                    rcv_msg["rsucces"] = False
+                    rcv_msg["rerror"] = "DATA INCOMPLETE"
                     break
-                    #rcv_msg["restado"] = "COMPLETE"
 
-        if rcv_msg["restado"] == "COMPLETE":
+        if rcv_msg["rsucces"]:
             rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
                                 struct.unpack('f', rcv_msg["rdata"][4:8])[0],
                                 struct.unpack('f', rcv_msg["rdata"][8:12])[0],
                                 struct.unpack('f', rcv_msg["rdata"][12:])[0]]
-            
             
         print rcv_msg
         return rcv_msg
@@ -196,7 +204,7 @@ if __name__ == "__main__":
     #state_timer.setInterval(1000)
     #state_timer.timeout.connect(main_socket.get_sstate)
     #state_timer.start()
-    main_socket.connectToHost(IP_NUMBER, PORT)
+    #main_socket.connectToHost(IP_NUMBER, PORT)
     main_socket.sendCommand(1, 4, "CUCHAROS")
     sys.exit(app.exec_())
     
