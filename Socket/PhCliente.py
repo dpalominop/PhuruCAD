@@ -73,7 +73,10 @@ def decodeData(data, rcv_msg):
             rcv_msg["rxor"] = c
             rcv_msg["restado"] = "COMPLETE"
             
-            if rcv_msg["rxor"] != genXor(rcv_msg["rdata"]):
+            if rcv_msg["rxor"] != genXor(chr(rcv_msg["rlen"])
+                                         +chr(rcv_msg["rdevice"])
+                                         +chr(rcv_msg["rcmd"])
+                                         +rcv_msg["rdata"]):
                 rcv_msg["rsucces"] = False
                 rcv_msg["rerror"] = "XOR INCORRECT"
 
@@ -133,7 +136,8 @@ class PhCliente(QTcpSocket):
     
     def sendCommand(self, dev_id, cmd, payload):
         self.connectToHost(IP_NUMBER, PORT)
-        self.sendData(encodeData(dev_id, cmd, payload))
+        
+        self.sendData(encodeData(dev_id, cmd, payload)) 
         
         rcv_msg = {
         "restado"    : "HEADER",
@@ -158,13 +162,13 @@ class PhCliente(QTcpSocket):
                     rcv_msg["rerror"] = "DATA INCOMPLETE"
                     break
 
-        if rcv_msg["rsucces"]:
+        if rcv_msg["rsucces"] and (rcv_msg["rlen"] == 18):
             rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
                                 struct.unpack('f', rcv_msg["rdata"][4:8])[0],
                                 struct.unpack('f', rcv_msg["rdata"][8:12])[0],
                                 struct.unpack('f', rcv_msg["rdata"][12:])[0]]
             
-        print rcv_msg
+        self.close()
         return rcv_msg
     
     @QtCore.Slot()
@@ -198,7 +202,7 @@ class PhCliente(QTcpSocket):
         
 
 if __name__ == "__main__":
-    app = QtCore.QCoreApplication(sys.argv)
+    #app = QtCore.QCoreApplication(sys.argv)
     main_socket = PhCliente()
     #state_timer = QtCore.QTimer()
     #state_timer.setInterval(1000)
@@ -206,5 +210,5 @@ if __name__ == "__main__":
     #state_timer.start()
     #main_socket.connectToHost(IP_NUMBER, PORT)
     main_socket.sendCommand(1, 4, "CUCHAROS")
-    sys.exit(app.exec_())
+    #sys.exit(app.exec_())
     
