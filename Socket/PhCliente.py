@@ -73,11 +73,12 @@ def decodeData(data, rcv_msg):
             rcv_msg["rxor"] = c
             rcv_msg["restado"] = "COMPLETE"
             
-            if rcv_msg["rxor"] != genXor(chr(rcv_msg["rlen"])
+            rcv_msg["rxor_rigth"] = genXor(chr(rcv_msg["rlen"])
                                          +chr(rcv_msg["rdevice"])
                                          +chr(rcv_msg["rcmd"])
-                                         +rcv_msg["rdata"]):
-                rcv_msg["rsucces"] = False
+                                         +rcv_msg["rdata"])
+            if rcv_msg["rxor"] != rcv_msg["rxor_rigth"]:
+                #rcv_msg["rsucces"] = False
                 rcv_msg["rerror"] = "XOR INCORRECT"
 
 
@@ -149,6 +150,7 @@ class PhCliente(QTcpSocket):
             "rheader"   : "",
             "rlen"      : 0,
             "rxor"      : "",
+            "rxor_rigth": "",
             "rdata"     : "",
             "rdevice"   : 0,
             "rcmd"      : 0,
@@ -219,7 +221,7 @@ class PhCliente(QTcpSocket):
         
 
 if __name__ == "__main__":
-    app = QtCore.QCoreApplication(sys.argv)
+    #app = QtCore.QCoreApplication(sys.argv)
     main_socket = PhCliente()
     #state_timer = QtCore.QTimer()
     #state_timer.setInterval(1000)
@@ -227,14 +229,26 @@ if __name__ == "__main__":
     #state_timer.start()
     #main_socket.connectToHost(IP_NUMBER, PORT)
     #main_socket.sendCommand(1, 4, "CUCHAROS")
+    
+    total_xor_fail = 0
+    total_errores = 0
     for i in range(200):
         #main_socket.connectToHost(IP_NUMBER, PORT)
         #msg = encodeData(1, i, "LAS CUQUIS")
         #print msg
         #main_socket.sendData(msg+"\n")
         
-        print main_socket.sendCommand(1, 4, "LAS CUQUIS")
-        
+        rmsg =  main_socket.sendCommand(1, 4, "LAS CUQUIS")
+        print rmsg
+        if rmsg["rerror"] == "XOR INCORRECT":
+            total_xor_fail += 1
+        if rmsg["rsucces"] == False:
+            total_errores += 1
+            
         #main_socket.close()
-    sys.exit(app.exec_())
+        
+    print "Numero Total de errores: ", total_errores
+    print "Numero de errores en xor: ", total_xor_fail
+        
+    #sys.exit(app.exec_())
     
