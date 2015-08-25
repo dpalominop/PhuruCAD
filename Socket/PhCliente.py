@@ -6,7 +6,6 @@ Created on 30/7/2015
 @contact: dpalomino@phuru.io
 '''
 
-import sys
 from PySide import QtCore
 from PySide.QtNetwork import QTcpSocket, QAbstractSocket
 import struct

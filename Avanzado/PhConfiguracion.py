@@ -6,9 +6,9 @@ Created on 23/7/2015
 '''
 
 import FreeCADGui as Gui
-from Ventanas import *
+#from Ventanas import *
 
-class Ph_Configuracion(object):
+class PhConfiguracion(object):
     '''
     classdocs
     '''
@@ -24,8 +24,9 @@ class Ph_Configuracion(object):
         return True
 
     def Activated(self):
-        self.ex = Example()
+        pass
+        #self.ex = Example()
     
     
         
-Gui.addCommand('Configuracion', Ph_Configuracion())
+Gui.addCommand('Configuracion', PhConfiguracion())

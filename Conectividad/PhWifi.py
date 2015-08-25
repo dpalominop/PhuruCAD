@@ -4,16 +4,19 @@ Created on 23/7/2015
 @author: Daniel Palomino
 @contact: dpalomino@phuru.pe
 '''
+from PySide import QtCore
+
 import FreeCADGui as Gui
 import FreeCAD as App
 import Part
-from mi_ventana import Principal
-#from mi_ventana_pyside import Principal
-from Socket.PhCliente import *
+
+from Vistas import PhWConfiguracion
+from Socket.PhCliente import PhCliente
 
 
-class Ph_Wifi(QtCore.QObject):
-    "Iniciar dispositivo por WIFI"
+class PhWifi(QtCore.QObject):
+    """Iniciar dispositivo por WIFI"""
+    
     timer = QtCore.QTimer()
     
     def GetResources(self):
@@ -29,24 +32,24 @@ class Ph_Wifi(QtCore.QObject):
     def Activated(self):
         #app = QtCore.QCoreApplication(sys.argv)
         self.socket = PhCliente()
-        self.principal = Principal()
+        self.wConfiguracion = PhWConfiguracion()
         
-        QtCore.QObject.connect(self.principal.PrimerSiguiente, 
+        QtCore.QObject.connect(self.wConfiguracion.PrimerSiguiente, 
                                QtCore.SIGNAL("pressed()"), 
                                self.socket, 
                                QtCore.SLOT("on_checkHardware()"))
         
         QtCore.QObject.connect(self.socket,
                                QtCore.SIGNAL("hwCheckedOk()"),
-                               self.principal,
+                               self.wConfiguracion,
                                QtCore.SLOT("segundaVentana()"))
         
-        QtCore.QObject.connect(self.principal,
+        QtCore.QObject.connect(self.wConfiguracion,
                                QtCore.SIGNAL("windowFinished()"),
                                self,
                                QtCore.SLOT("iniciarProceso()")
                                )
-        #self.principal.connect(QtCore.SIGNAL("windowFinished()"), QtCore.SLOT("iniciarProceso()"))
+        #self.wConfiguracion.connect(QtCore.SIGNAL("windowFinished()"), QtCore.SLOT("iniciarProceso()"))
         
     @QtCore.Slot()
     def iniciarProceso(self):
@@ -79,4 +82,4 @@ class Ph_Wifi(QtCore.QObject):
             self.l.StartPoint = self.l.EndPoint.add(App.Vector(0.0,0.0,0.0))
         
 
-Gui.addCommand('WIFI_Tool', Ph_Wifi())
+Gui.addCommand('WIFI_Tool', PhWifi())
