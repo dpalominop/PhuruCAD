@@ -149,12 +149,13 @@ class PhCliente(QTcpSocket):
         rcv_msg = {
             "restado"    : "HEADER",
             "rheader"   : "",
-            "rlen"      : 0,
+            "rlen"      : -1,
             "rxor"      : "",
             "rxor_rigth": "",
             "rdata"     : "",
-            "rdevice"   : 0,
-            "rcmd"      : 0,
+            "rdevice"   : -1,
+            "rcmd"      : -1,
+            "rstate"    : -1,
             "rerror"    : "",
             "rsucces"   : True
             }
@@ -175,11 +176,12 @@ class PhCliente(QTcpSocket):
                         rcv_msg["rerror"] = "DATA INCOMPLETE"
                         break
     
-            if rcv_msg["rsucces"] and (rcv_msg["rlen"] == 18):
-                rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
-                                    struct.unpack('f', rcv_msg["rdata"][4:8])[0],
-                                    struct.unpack('f', rcv_msg["rdata"][8:12])[0],
-                                    struct.unpack('f', rcv_msg["rdata"][12:])[0]]
+            if rcv_msg["rsucces"] and (rcv_msg["rlen"] == 19):
+                rcv_msg["rstate"] = ord(rcv_msg["rdata"][0])
+                rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][1:5])[0],
+                                    struct.unpack('f', rcv_msg["rdata"][5:9])[0],
+                                    struct.unpack('f', rcv_msg["rdata"][9:13])[0],
+                                    struct.unpack('f', rcv_msg["rdata"][13:])[0]]
                 
             self.close()
         
