@@ -78,7 +78,7 @@ def decodeData(data, rcv_msg):
                                          +chr(rcv_msg["rcmd"])
                                          +rcv_msg["rdata"])
             if rcv_msg["rxor"] != rcv_msg["rxor_rigth"]:
-                #rcv_msg["rsucces"] = False
+                rcv_msg["rsucces"] = False
                 rcv_msg["rerror"] = "XOR INCORRECT"
 
 
@@ -100,6 +100,7 @@ def socketStateToString(num):
 
 class PhCliente(QTcpSocket):
     data_ready = QtCore.Signal(unicode)
+    hwCheckedOk = QtCore.Signal()
     
     def __init__(self):
         QTcpSocket.__init__(self)
@@ -218,6 +219,12 @@ class PhCliente(QTcpSocket):
     @QtCore.Slot()
     def on_connected(self):
         print 'connected!'
+        
+    @QtCore.Slot()
+    def on_checkHardware(self):
+        rmsg =  main_socket.sendCommand(1, 4, "LAS CUQUIS")
+        if rmsg["rsucces"]:
+            self.hwCheckedOk.emit()
         
 
 if __name__ == "__main__":

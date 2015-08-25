@@ -18,6 +18,7 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 class Principal(QtGui.QStackedWidget):
+    windowFinished = QtCore.Signal()
     def __init__(self):
         super(Principal, self).__init__()
         self.setupUi()
@@ -137,5 +138,6 @@ class Principal(QtGui.QStackedWidget):
     
     def aceptar(self):
         self.close()
+        self.windowFinished.emit()
 
 #import Phuru_rc
