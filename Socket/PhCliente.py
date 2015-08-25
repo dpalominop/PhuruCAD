@@ -8,7 +8,7 @@ Created on 30/7/2015
 
 import sys
 from PySide import QtCore
-from PySide.QtNetwork import QTcpSocket
+from PySide.QtNetwork import QTcpSocket, QAbstractSocket
 import struct
 
 MAX_WAIT_LEN  = 8
@@ -121,10 +121,11 @@ class PhCliente(QTcpSocket):
     def close(self):
         print 'close!'
         self.disconnectFromHost()
-        if self.waitForDisconnected(1000):
-            print "SOCKET DISCONNTED!"
-        else:
-            print " ERROR IN SOCKET DISCONNTING PROCESS!"
+        if self.isOpen():
+            if (self.state() == QAbstractSocket.UnconnectedState or self.waitForDisconnected(1000)):
+                print "SOCKET DISCONECTED!"
+            else:
+                print " ERROR IN SOCKET. DISCONECTING PROCESS!"
 
     
     def on_ready_read(self):
@@ -196,11 +197,11 @@ class PhCliente(QTcpSocket):
         
     @QtCore.Slot()
     def on_error(self):
-        print 'error', self.errorString()
+        print 'error: ', self.errorString()
         self.close()
         #self.connectToHost(IP_NUMBER, PORT)
         #QTimer.singleShot(3000, functools.partial(self.connectToHost, IP_NUMBER, PORT))
-        QtCore.QMetaObject.invokeMethod(self, 'do_reconnect',  QtCore.Qt.QueuedConnection)
+        #QtCore.QMetaObject.invokeMethod(self, 'do_reconnect',  QtCore.Qt.QueuedConnection)
 
     @QtCore.Slot()
     def do_reconnect(self):
@@ -227,11 +228,13 @@ if __name__ == "__main__":
     #main_socket.connectToHost(IP_NUMBER, PORT)
     #main_socket.sendCommand(1, 4, "CUCHAROS")
     for i in range(200):
-        main_socket.connectToHost(IP_NUMBER, PORT)
-        msg = encodeData(1, i, "LAS CUQUIS")
-        print msg
-        main_socket.sendData(msg+"\n")
+        #main_socket.connectToHost(IP_NUMBER, PORT)
+        #msg = encodeData(1, i, "LAS CUQUIS")
+        #print msg
+        #main_socket.sendData(msg+"\n")
         
-        main_socket.close()
+        print main_socket.sendCommand(1, 4, "LAS CUQUIS")
+        
+        #main_socket.close()
     sys.exit(app.exec_())
     
