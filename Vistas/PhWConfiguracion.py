@@ -25,7 +25,7 @@ class PhWConfiguracion(QtGui.QStackedWidget):
         self.show()
     
     def setupUi(self):
-        self.setObjectName("Configuración")
+        self.setObjectName("Configuracion")
         self.resize(421, 270)
         self.setMinimumSize(QtCore.QSize(421, 270))
         self.setMaximumSize(QtCore.QSize(421, 270))

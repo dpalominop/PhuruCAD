@@ -10,14 +10,12 @@ import FreeCADGui as Gui
 import FreeCAD as App
 import Part
 
-from Vistas import PhWConfiguracion
-from Socket.PhCliente import PhCliente
-
+from Vistas.PhWConfiguracion import *
+from Socket.PhCliente import *
 
 class PhWifi(QtCore.QObject):
     """Iniciar dispositivo por WIFI"""
     
-    timer = QtCore.QTimer()
     
     def GetResources(self):
         return {"MenuText": "&WIFI",
@@ -31,6 +29,7 @@ class PhWifi(QtCore.QObject):
 
     def Activated(self):
         #app = QtCore.QCoreApplication(sys.argv)
+        self.timer = QtCore.QTimer()
         self.socket = PhCliente()
         self.wConfiguracion = PhWConfiguracion()
         
