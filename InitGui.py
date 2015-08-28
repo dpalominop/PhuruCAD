@@ -13,7 +13,7 @@ class PhuruWorkbench ( Workbench ):
 			/* XPM */
 			static const char *test_icon[]={
 			"16 16 2 1",
-			"a c #000000",
+			"a c #AA0000",
 			". c None",
 			"................",
 			"................",
@@ -32,16 +32,20 @@ class PhuruWorkbench ( Workbench ):
 			"................",
 			"................"};
 			"""
+
 	MenuText = "Phuru"
 	ToolTip = "Phuru workbench"
 
 	def Initialize(self):
-		from Conectividad import PhUSB, PhWifi
+		#from Conectividad import PhUSB
+		from Conectividad import PhWifiConfiguracion
+		from Conectividad import PhWifiEjecucion
 		from Avanzado import PhConfiguracion
 		
-		self.appendToolbar("PHURU", ["USB_Tool"])
+		#self.appendToolbar("PHURU", ["USB_Tool"])
 		self.appendToolbar("PHURU", ["WIFI_Tool"])
-		self.appendMenu(["PHURU", "&Conectividad"], ["WIFI_Tool", "USB_Tool"])
+		self.appendToolbar("PHURU", ["WIFI_EXEC"])
+		self.appendMenu(["PHURU", "&Conectividad"], ["WIFI_Tool", "WIFI_EXEC"])
 		self.appendMenu(["PHURU", "&Avanzado"], ["Separator", "Configuracion"])
 
 	def GetClassName(self):

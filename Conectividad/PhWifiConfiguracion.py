@@ -13,14 +13,14 @@ import Part
 from Vistas.PhWConfiguracion import *
 from Socket.PhCliente import *
 
-class PhWifi(QtCore.QObject):
-    """Iniciar dispositivo por WIFI"""
+class PhWifiConfiguracion(QtCore.QObject):
+    """Configurar dispositivo por WIFI"""
     
     
     def GetResources(self):
         return {"MenuText": "&WIFI",
                        "Accel": "Ctrl+N",
-                       "ToolTip": "Iniciar dispositivo por WIFI",
+                       "ToolTip": "Configurar dispositivo por WIFI",
                        "Pixmap"  : ""
         }
 
@@ -81,4 +81,7 @@ class PhWifi(QtCore.QObject):
             self.l.StartPoint = self.l.EndPoint.add(App.Vector(0.0,0.0,0.0))
         
 
-Gui.addCommand('WIFI_Tool', PhWifi())
+Gui.addCommand('WIFI_Tool', PhWifiConfiguracion())
+
+if __name__ == '__main__':
+    pass

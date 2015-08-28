@@ -229,22 +229,12 @@ class PhCliente(QTcpSocket):
         
 
 if __name__ == "__main__":
-    #app = QtCore.QCoreApplication(sys.argv)
+    
     main_socket = PhCliente()
-    #state_timer = QtCore.QTimer()
-    #state_timer.setInterval(1000)
-    #state_timer.timeout.connect(main_socket.get_sstate)
-    #state_timer.start()
-    #main_socket.connectToHost(IP_NUMBER, PORT)
-    #main_socket.sendCommand(1, 4, "CUCHAROS")
     
     total_xor_fail = 0
     total_errores = 0
     for i in range(200):
-        #main_socket.connectToHost(IP_NUMBER, PORT)
-        #msg = encodeData(1, i, "LAS CUQUIS")
-        #print msg
-        #main_socket.sendData(msg+"\n")
         
         rmsg =  main_socket.sendCommand(1, 4, "LAS CUQUIS")
         print rmsg
@@ -252,11 +242,6 @@ if __name__ == "__main__":
             total_xor_fail += 1
         if rmsg["rsucces"] == False:
             total_errores += 1
-            
-        #main_socket.close()
         
     print "Numero Total de errores: ", total_errores
     print "Numero de errores en xor: ", total_xor_fail
-        
-    #sys.exit(app.exec_())
-    
