@@ -28,6 +28,7 @@ class PhWifiConfiguracion(QtCore.QObject):
         return True
 
     def Activated(self):
+        
         #app = QtCore.QCoreApplication(sys.argv)
         self.timer = QtCore.QTimer()
         self.socket = PhCliente()
@@ -59,7 +60,7 @@ class PhWifiConfiguracion(QtCore.QObject):
         self.l = Part.Line()
         self.l.StartPoint = App.Vector(0.0,0.0,0.0)
         self.timer.timeout.connect(self.dibujarPunto)
-        self.timer.start(100)
+        self.timer.start(3000)
         
     def detenerProceso(self):
         #self.PuertoSerie.close()
@@ -71,6 +72,7 @@ class PhWifiConfiguracion(QtCore.QObject):
         #    return
         #else:
         rmsg = self.socket.sendCommand(1, 4, "CUCHAROS")
+        App.Console.PrintMessage(rmsg)
         
         if rmsg["rsucces"]:
             x,y,z,d = rmsg["rdata"]
