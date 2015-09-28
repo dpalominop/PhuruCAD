@@ -72,7 +72,7 @@ class PhWifiConfiguracion(QtCore.QObject):
         #    return
         #else:
         rmsg = self.socket.sendCommand(1, 4, "CUCHAROS")
-        App.Console.PrintMessage(rmsg)
+        App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
         if rmsg["rsucces"]:
             x,y,z,d = rmsg["rdata"]
