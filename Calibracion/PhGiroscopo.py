@@ -7,7 +7,6 @@ Created on 28/9/2015
 from __future__ import division # allows floating point division from integers
 import FreeCAD, Part
 from FreeCAD import Base
-from wx import Height
 
 class PhGyroscope:
     def __init__(self, obj):
@@ -16,11 +15,12 @@ class PhGyroscope:
         obj.Proxy = self
 
     def onChanged(self, fp, prop): 
-        #if prop == "Radius" or prop == "Eccentricity" or prop == "Height" or prop == "Segments": #if one of these is changed
-        self.execute(fp)
+        if prop == "Height" or prop == "Segments": #if one of these is changed
+            self.execute(fp)
 
     def execute(self, fp): #main part of script
         
+        h = fp.Height
         halfw = 20
         halfh = 20
         
