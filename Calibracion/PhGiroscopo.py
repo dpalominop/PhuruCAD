@@ -11,12 +11,8 @@ from wx import Height
 
 class PhGyroscope:
     def __init__(self, obj):
-        ''' Add the properties: Radius, Eccentricity, Height, Segments (see Property View) '''
-        #obj.addProperty("App::PropertyLength","Radius","Gyroscope","Base radius").Radius=60.0
-        #obj.addProperty("App::PropertyLength","Eccentricity","Gyroscope","Rotor eccentricity").Eccentricity=12.0
+        ''' Add the properties: Height, Segments (see Property View) '''
         obj.addProperty("App::PropertyLength","Height","Gyroscope","Height of the block").Height=10.0
-        #obj.addProperty("App::PropertyLength","Segments","Gyroscope","Number of the line segments").Segments=72
-        #obj.addProperty("App::PropertyLength","Twenty","Gyroscope","Twenty").Twenty=20.0
         obj.Proxy = self
 
     def onChanged(self, fp, prop): 
@@ -24,13 +20,6 @@ class PhGyroscope:
         self.execute(fp)
 
     def execute(self, fp): #main part of script
-        #steps=int(fp.Segments) #get value from property
-        #e=fp.Eccentricity
-        #r=fp.Radius
-        h=fp.Height
-        #halfw=r+e+20
-        #halfw = int(r)+int(e)+20
-        #halfh=int(r)+int(e)+20
         
         halfw = 20
         halfh = 20
@@ -52,7 +41,6 @@ def makeReferenceSystem():
     #gyros.Label = "Gyroscope"
     PhGyroscope(gyros)
     gyros.ViewObject.Proxy=0
-    
     
     import FreeCADGui as Gui
     Gui.activeDocument().activeView().viewAxometric()
