@@ -11,7 +11,7 @@ import FreeCAD as App
 import Part
 
 from Socket.PhCliente import *
-from Calibracion.PhGiroscopo import *
+#from Calibracion.PhGiroscopo import *
 
 class PhControlOrientacion(QtCore.QObject):
     """Iniciar y detener envio de datos por WIFI"""
@@ -38,19 +38,28 @@ class PhControlOrientacion(QtCore.QObject):
         
     @QtCore.Slot()
     def iniciarProceso(self):
-        self.doc = FreeCAD.activeDocument()
+        self.doc = App.activeDocument()
         if self.doc == None:
-            self.doc = FreeCAD.newDocument("PhGyroscope")
-            gyros = self.doc.addObject("Part::FeaturePython","Gyroscope") #add object to document
+            self.doc = App.newDocument("PhGyroscope")
+            #gyros = self.doc.addObject("Part::FeaturePython","Gyroscope") #add object to document
             #gyros.Label = "Gyroscope"
-            PhGyroscope(gyros)
-            gyros.ViewObject.Proxy=0
+            #PhGyroscope(gyros)
+            #gyros.ViewObject.Proxy=0
+        
+        App.ActiveDocument.addObject("Part::Box","Box")
+        App.ActiveDocument.ActiveObject.Label = "Box"
+        App.getDocument("PhGyroscope").getObject("Box").Width = '40 mm'
+        App.getDocument("PhGyroscope").getObject("Box").Length = '20 mm'
+        App.getDocument("PhGyroscope").getObject("Box").Height = '10 mm'
+        App.ActiveDocument.recompute()
+        Gui.SendMsgToActiveView("ViewFit")
+        Gui.activeDocument().activeView().viewAxometric()
         
         
         self.timer = QtCore.QTimer()
         self.socket = PhCliente()
         self.timer.timeout.connect(self.controlGiro)
-        self.timer.start(100)
+        self.timer.start(1000)
         
     def detenerProceso(self):
         self.timer.disconnect()
@@ -66,7 +75,7 @@ class PhControlOrientacion(QtCore.QObject):
             App.getDocument("PhGyroscope").Gyroscope.Placement=App.Placement(App.Vector(0,0,0), 
                                                                          App.Rotation(yaw, pitch, roll), 
                                                                          App.Vector(0,0,0))
-            
+            App.ActiveDocument.recompute()
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
 Gui.addCommand('GYROSCOPE_1', PhControlOrientacion())
