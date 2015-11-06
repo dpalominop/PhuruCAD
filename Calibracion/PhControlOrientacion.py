@@ -69,7 +69,7 @@ class PhControlOrientacion(QtCore.QObject):
         rmsg = self.socket.sendCommand(1, 4, "CUCHAROS")
         
         if rmsg["rsucces"]:
-            yaw,pitch,roll,time = rmsg["rdata"]
+            bstate, yaw,pitch,roll,time = rmsg["rdata"]
             
             App.getDocument("PhGyroscope").Box.Placement=App.Placement(App.Vector(0,0,0), 
                                                                          App.Rotation(yaw, pitch, roll),

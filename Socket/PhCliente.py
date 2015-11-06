@@ -77,8 +77,9 @@ def decodeData(data, rcv_msg):
                                          +chr(rcv_msg["rdevice"])
                                          +chr(rcv_msg["rcmd"])
                                          +rcv_msg["rdata"])
-            if rcv_msg["rxor"] != rcv_msg["rxor_rigth"]:
-                rcv_msg["rsucces"] = False
+            if rcv_msg["rxor"] == rcv_msg["rxor_rigth"]:
+                rcv_msg["rsucces"] = True
+            else:
                 rcv_msg["rerror"] = "XOR INCORRECT"
 
 
@@ -157,7 +158,7 @@ class PhCliente(QTcpSocket):
             "rcmd"      : -1,
             "rstate"    : -1,
             "rerror"    : "",
-            "rsucces"   : True
+            "rsucces"   : False
             }
         
         self.connectToHost(IP_NUMBER, PORT)
@@ -176,12 +177,58 @@ class PhCliente(QTcpSocket):
                         rcv_msg["rerror"] = "DATA INCOMPLETE"
                         break
     
-            if rcv_msg["rsucces"] and (rcv_msg["rlen"] == 19):
-                rcv_msg["rstate"] = ord(rcv_msg["rdata"][0])
-                rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][1:5])[0],
-                                    struct.unpack('f', rcv_msg["rdata"][5:9])[0],
-                                    struct.unpack('f', rcv_msg["rdata"][9:13])[0],
-                                    struct.unpack('f', rcv_msg["rdata"][13:])[0]]
+            if rcv_msg["rsucces"]:
+                
+                if (cmd ==  0):
+                    pass
+
+                elif (cmd ==  1):
+                    pass
+
+                elif (cmd ==  2):
+                    pass
+                
+                elif (cmd ==  3):
+                    pass
+                
+                elif (cmd ==  4) and (rcv_msg["rlen"] == 19):
+                    rcv_msg["rdata"] = [ord(rcv_msg["rdata"][0]),
+                                        struct.unpack('f', rcv_msg["rdata"][1:5])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][5:9])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][9:13])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][13:])[0]]
+                    
+                elif (cmd ==  5) and (rcv_msg["rlen"] == 42):
+                    rcv_msg["rdata"] = [[struct.unpack('f', rcv_msg["rdata"][0:4])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][4:8])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][8:12])[0]],
+                                        
+                                        [struct.unpack('f', rcv_msg["rdata"][12:16])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][16:20])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][20:24])[0]],
+                                        
+                                        [struct.unpack('f', rcv_msg["rdata"][24:28])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][28:32])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][32:36])[0]],
+                                        
+                                        struct.unpack('f', rcv_msg["rdata"][36:40])[0]]
+                
+                elif (cmd ==  6):
+                    pass
+                    
+                elif (cmd ==  7) and (rcv_msg["rlen"] == 18):
+                    rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][4:8])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][8:12])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][12:16])[0]]
+                
+                elif (cmd ==  8) and (rcv_msg["rlen"] == 14):
+                    rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][4:8])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][8:12])[0]]
+                
+                elif (cmd ==  9):
+                    pass
                 
             self.close()
         
