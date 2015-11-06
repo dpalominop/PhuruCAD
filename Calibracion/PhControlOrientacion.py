@@ -8,7 +8,7 @@ from PySide import QtCore
 
 import FreeCADGui as Gui
 import FreeCAD as App
-import Part
+import Part, Draft
 
 from Socket.PhCliente import *
 #from Calibracion.PhGiroscopo import *
@@ -44,10 +44,13 @@ class PhControlOrientacion(QtCore.QObject):
         
         App.ActiveDocument.addObject("Part::Box","Box")
         App.ActiveDocument.ActiveObject.Label = "Box"
-        App.getDocument("PhGyroscope").getObject("Box").Width = '40 mm'
+        App.getDocument("PhGyroscope").getObject("Box").Width = '20 mm'
         App.getDocument("PhGyroscope").getObject("Box").Length = '20 mm'
-        App.getDocument("PhGyroscope").getObject("Box").Height = '10 mm'
-        App.ActiveDocument.recompute()
+        App.getDocument("PhGyroscope").getObject("Box").Height = '20 mm'
+        Draft.makeLine(App.Vector(10,10,10),App.Vector(10,10,50))
+        Draft.makeLine(App.Vector(10,10,10),App.Vector(10,50,10))
+        Draft.makeLine(App.Vector(10,10,10),App.Vector(50,10,10))
+        #App.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxometric()
         
@@ -55,7 +58,7 @@ class PhControlOrientacion(QtCore.QObject):
         self.timer = QtCore.QTimer()
         self.socket = PhCliente()
         self.timer.timeout.connect(self.controlGiro)
-        self.timer.start(1000)
+        self.timer.start(100)
         
     def detenerProceso(self):
         self.timer.disconnect()
@@ -69,8 +72,8 @@ class PhControlOrientacion(QtCore.QObject):
             yaw,pitch,roll,time = rmsg["rdata"]
             
             App.getDocument("PhGyroscope").Box.Placement=App.Placement(App.Vector(0,0,0), 
-                                                                         App.Rotation(yaw, pitch, roll), 
-                                                                         App.Vector(0,0,0))
+                                                                         App.Rotation(yaw, pitch, roll),
+                                                                         App.Vector(10,10,10))
             #App.ActiveDocument.recompute()
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
