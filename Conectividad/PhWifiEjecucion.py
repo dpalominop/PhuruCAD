@@ -60,7 +60,8 @@ class PhWifiEjecucion(QtCore.QObject):
         
         if rmsg["rsucces"]:
             x,y,z,d = rmsg["rdata"]
-            self.l.EndPoint = self.l.EndPoint.add(App.Vector(float(x),float(y),float(z)))
+            #self.l.EndPoint = self.l.EndPoint.add(App.Vector(float(x),float(y),float(z)))
+            self.l.EndPoint = App.Vector(float(x),float(y),float(z))
             
             self.doc.addObject("Part::Feature","Line").Shape = self.l.toShape() 
             self.doc.recompute()
