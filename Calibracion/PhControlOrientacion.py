@@ -55,7 +55,7 @@ class PhControlOrientacion(QtCore.QObject):
         self.timer = QtCore.QTimer()
         self.socket = PhCliente()
         self.timer.timeout.connect(self.controlGiro)
-        #self.timer.start(1000)
+        self.timer.start(1000)
         
     def detenerProceso(self):
         self.timer.disconnect()
