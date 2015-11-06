@@ -41,10 +41,6 @@ class PhControlOrientacion(QtCore.QObject):
         self.doc = App.activeDocument()
         if self.doc == None:
             self.doc = App.newDocument("PhGyroscope")
-            #gyros = self.doc.addObject("Part::FeaturePython","Gyroscope") #add object to document
-            #gyros.Label = "Gyroscope"
-            #PhGyroscope(gyros)
-            #gyros.ViewObject.Proxy=0
         
         App.ActiveDocument.addObject("Part::Box","Box")
         App.ActiveDocument.ActiveObject.Label = "Box"
@@ -59,7 +55,7 @@ class PhControlOrientacion(QtCore.QObject):
         self.timer = QtCore.QTimer()
         self.socket = PhCliente()
         self.timer.timeout.connect(self.controlGiro)
-        self.timer.start(1000)
+        #self.timer.start(1000)
         
     def detenerProceso(self):
         self.timer.disconnect()
@@ -72,10 +68,10 @@ class PhControlOrientacion(QtCore.QObject):
         if rmsg["rsucces"]:
             yaw,pitch,roll,time = rmsg["rdata"]
             
-            App.getDocument("PhGyroscope").Gyroscope.Placement=App.Placement(App.Vector(0,0,0), 
+            App.getDocument("PhGyroscope").Box.Placement=App.Placement(App.Vector(0,0,0), 
                                                                          App.Rotation(yaw, pitch, roll), 
                                                                          App.Vector(0,0,0))
-            App.ActiveDocument.recompute()
+            #App.ActiveDocument.recompute()
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
 Gui.addCommand('GYROSCOPE_1', PhControlOrientacion())

@@ -9,6 +9,7 @@ Created on 30/7/2015
 from PySide import QtCore
 from PySide.QtNetwork import QTcpSocket, QAbstractSocket
 import struct
+import FreeCAD as App
 
 MAX_WAIT_LEN  = 8
 PORT = 2323
@@ -115,33 +116,33 @@ class PhCliente(QTcpSocket):
         #QTcpSocket.abort(self)
         QTcpSocket.connectToHost(self, host, port)
         if QTcpSocket.waitForConnected(self, 1000):
-            print "Connected OK"
+            App.Console.PrintMessage("Connected OK\n")
         else:
-            print "Fail Connection!"
+            App.Console.PrintMessage("Fail Connection!\n")
 
     def close(self):
         print 'close!'
         self.disconnectFromHost()
         if self.isOpen():
             if (self.state() == QAbstractSocket.UnconnectedState or self.waitForDisconnected(1000)):
-                print "SOCKET DISCONECTED!"
+                App.Console.PrintMessage("SOCKET DISCONECTED!\n")
             else:
-                print " ERROR IN SOCKET. DISCONECTING PROCESS!"
+                App.Console.PrintMessage(" ERROR IN SOCKET. DISCONECTING PROCESS!\n")
 
     
     def on_ready_read(self):
         if self.bytesAvailable():
-            print 'read!'
+            App.Console.PrintMessage('read!\n')
             return str(self.readAll())
         else:
             return ""
         
     def sendData(self, data):
-        print 'write!'
+        App.Console.PrintMessage('write!\n')
         self.writeData('%s' % data, len(data))
 
     def receiveData(self):
-        print 'read!'
+        App.Console.PrintMessage('read!\n')
         return str(self.readAll())
     
     def sendCommand(self, dev_id, cmd, payload):
@@ -193,15 +194,15 @@ class PhCliente(QTcpSocket):
     
     @QtCore.Slot()
     def print_command(self, data):
-        print 'data!'
+        App.Console.PrintMessage('data!\n')
         
     @QtCore.Slot()
     def get_sstate(self):
-        print "SOCKET STATE: ", socketStateToString(self.state())
+        App.Console.PrintMessage("SOCKET STATE: " + socketStateToString(self.state()) + "\n")
         
     @QtCore.Slot()
     def on_error(self):
-        print 'error: ', self.errorString()
+        App.Console.PrintMessage('error: ' + self.errorString() + "\n")
         self.close()
         #self.connectToHost(IP_NUMBER, PORT)
         #QTimer.singleShot(3000, functools.partial(self.connectToHost, IP_NUMBER, PORT))
@@ -209,17 +210,17 @@ class PhCliente(QTcpSocket):
 
     @QtCore.Slot()
     def do_reconnect(self):
-        print 'Trying to reconnect'
+        App.Console.PrintMessage('Trying to reconnect\n')
         self.close()
         self.connectToHost(IP_NUMBER, PORT)
         
     @QtCore.Slot()
     def on_disconnect(self):
-        print 'disconnected!'
+        App.Console.PrintMessage('disconnected!\n')
         
     @QtCore.Slot()
     def on_connected(self):
-        print 'connected!'
+        App.Console.PrintMessage('connected!\n')
         
     @QtCore.Slot()
     def on_checkHardware(self):
