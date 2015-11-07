@@ -75,7 +75,7 @@ class PhWifiConfiguracion(QtCore.QObject):
         App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
         if rmsg["rsucces"]:
-            bstate, x,y,z,d = rmsg["rdata"]
+            bstate, x,y,z,t = rmsg["rdata"]
             self.l.EndPoint = self.l.EndPoint.add(App.Vector(float(x),float(y),float(z)))
             
             self.doc.addObject("Part::Feature","Line").Shape = self.l.toShape() 

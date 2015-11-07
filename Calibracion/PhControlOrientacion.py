@@ -66,10 +66,10 @@ class PhControlOrientacion(QtCore.QObject):
         self.timer.killTimer()
     
     def controlGiro(self):
-        rmsg = self.socket.sendCommand(1, 4, "CUCHAROS")
+        rmsg = self.socket.sendCommand(1, 8, "CUCHAROS")
         
         if rmsg["rsucces"]:
-            bstate, yaw,pitch,roll,time = rmsg["rdata"]
+            yaw,pitch,roll = rmsg["rdata"]
             
             App.getDocument("PhGyroscope").Box.Placement=App.Placement(App.Vector(0,0,0), 
                                                                          App.Rotation(yaw, pitch, roll),

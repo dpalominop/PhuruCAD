@@ -271,7 +271,7 @@ class PhCliente(QTcpSocket):
         
     @QtCore.Slot()
     def on_checkHardware(self):
-        rmsg =  main_socket.sendCommand(1, 4, "LAS CUQUIS")
+        rmsg =  main_socket.sendCommand(1, 2, "LAS CUQUIS")
         if rmsg["rsucces"]:
             self.hwCheckedOk.emit()
         
@@ -284,7 +284,7 @@ if __name__ == "__main__":
     total_errores = 0
     for i in range(200):
         
-        rmsg =  main_socket.sendCommand(1, 4, "LAS CUQUIS")
+        rmsg =  main_socket.sendCommand(1, 8, "LAS CUQUIS")
         print rmsg
         if rmsg["rerror"] == "XOR INCORRECT":
             total_xor_fail += 1
