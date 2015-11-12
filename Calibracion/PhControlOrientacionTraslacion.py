@@ -94,7 +94,7 @@ class PhControlOrientacionTraslacion(QtCore.QObject):
         
         return (yaw, pitch, roll)
         
-Gui.addCommand('GYROSCOPE_2', PhControlOrientacionTraslacion())
+Gui.addCommand('GYROSCOPE_ACCELEROMETER', PhControlOrientacionTraslacion())
 
 
 if __name__ == '__main__':

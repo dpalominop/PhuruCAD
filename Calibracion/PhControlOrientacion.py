@@ -94,7 +94,7 @@ class PhControlOrientacion(QtCore.QObject):
         
         return (yaw, pitch, roll)
         
-Gui.addCommand('GYROSCOPE_1', PhControlOrientacion())
+Gui.addCommand('GYROSCOPE', PhControlOrientacion())
 
 
 if __name__ == '__main__':
