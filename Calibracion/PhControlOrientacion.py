@@ -88,9 +88,9 @@ class PhControlOrientacion(QtCore.QObject):
         R32 = 2.0 * (q2 * q3 + q0 * q1)
         R33 = 2.0 * q0 * q0 - 1.0 + 2.0 * q3 * q3
     
-        yaw = math.atan2(R32, R33)
-        pitch = -math.atan(R31 * ((1 - R31 * R31)**-1/2))
-        roll = math.atan2(R21, R11)
+        yaw = math.atan2(R32, R33)*180/math.pi
+        pitch = -math.atan(R31 * ((1 - R31 * R31)**-1/2))*180/math.pi
+        roll = math.atan2(R21, R11)*180/math.pi
         
         return (yaw, pitch, roll)
         

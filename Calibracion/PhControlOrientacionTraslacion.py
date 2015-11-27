@@ -19,7 +19,7 @@ class PhControlOrientacionTraslacion(QtCore.QObject):
     
     start = True
     def GetResources(self):
-        return {"MenuText": "&CONTROL SOLO ORIENTACION",
+        return {"MenuText": "&CONTROL COMPLETO",
                        "Accel": "Ctrl+N",
                        "ToolTip": "Verificar solo la orientacion del giro del dispositivo",
                        "Pixmap"  : ""
