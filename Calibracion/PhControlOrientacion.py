@@ -55,6 +55,13 @@ class PhControlOrientacion(QtCore.QObject):
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxometric()
         
+        Gui.getDocument("PhGyroscope").getObject("Line").LineColor = (0.00,0.00,1.00)
+        Gui.getDocument("PhGyroscope").getObject("Line001").LineColor = (0.00,1.00,0.00)
+        Gui.getDocument("PhGyroscope").getObject("Line002").LineColor = (1.00,0.00,0.00)
+        Gui.getDocument("PhGyroscope").getObject("Line").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument("PhGyroscope").getObject("Line001").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument("PhGyroscope").getObject("Line002").PointColor = (0.67,0.67,1.00)
+        
         
         self.timer = QtCore.QTimer()
         self.socket = PhCliente()

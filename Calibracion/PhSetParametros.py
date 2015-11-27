@@ -10,7 +10,7 @@ from PySide.QtSql import *
 
 import FreeCADGui as Gui
 import FreeCAD as App
-import Part
+import Part, Draft
 
 from Vistas.PhWSetParametros import *
 from Socket.PhCliente import *
@@ -18,6 +18,13 @@ from Vistas.PhWSetParametros import *
 
 #def computeHash(original):
 #    return QCryptographicHash.hash(QString(original).toUtf8(), QCryptographicHash.Md5).toHex()
+
+# Estimar parametros
+def fitfunc(p,coords):
+    x0,y0,z0,a,b,c=p
+    x,y,z=coords.T
+    return ((x-x0)/a)**2+((y-y0)/b)**2+((z-z0)/c)**2
+
 
 class PhSetParametros(QtCore.QObject):
     """Settear parametros de los sensores"""
@@ -60,20 +67,36 @@ class PhSetParametros(QtCore.QObject):
                                self,
                                QtCore.SLOT("exit()"))
         
+        self.iniciarProceso()
         #self.wConfiguracion.connect(QtCore.SIGNAL("windowFinished()"), QtCore.SLOT("iniciarProceso()"))
         
     @QtCore.Slot()
     def iniciarProceso(self):
         self.doc = App.activeDocument()
         if self.doc == None:
-            self.doc = App.newDocument("PHURU")
+            self.doc = App.newDocument("Parametros")
 
         self.dbConnect()
 
         self.l = Part.Line()
         self.l.StartPoint = App.Vector(0.0,0.0,0.0)
+        
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,0,40))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,40,0))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(40,0,0))
+        #App.ActiveDocument.recompute()
+        Gui.SendMsgToActiveView("ViewFit")
+        Gui.activeDocument().activeView().viewAxometric()
+        Gui.getDocument("Parametros").getObject("Line").LineColor = (0.00,0.00,1.00)
+        Gui.getDocument("Parametros").getObject("Line001").LineColor = (0.00,1.00,0.00)
+        Gui.getDocument("Parametros").getObject("Line002").LineColor = (1.00,0.00,0.00)
+        Gui.getDocument("Parametros").getObject("Line").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument("Parametros").getObject("Line001").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument("Parametros").getObject("Line002").PointColor = (0.67,0.67,1.00)
+        
+        
         self.timer.timeout.connect(self.dibujarPunto)
-        self.timer.start(100)
+        #self.timer.start(100)
         
     def detenerProceso(self):
         #self.PuertoSerie.close()
@@ -91,10 +114,10 @@ class PhSetParametros(QtCore.QObject):
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
             self.dbInsert(v_mag, v_accel, v_gyr, t)
             
-            self.l.EndPoint = App.Vector(float(x),float(y),float(z))
-            self.doc.addObject("Part::Feature","Line").Shape = self.l.toShape() 
-            self.doc.recompute()
-            self.l.StartPoint = self.l.EndPoint.add(App.Vector(0.0,0.0,0.0))
+            #self.l.EndPoint = App.Vector(float(x),float(y),float(z))
+            #self.doc.addObject("Part::Feature","Line").Shape = self.l.toShape() 
+            #self.doc.recompute()
+            #self.l.StartPoint = self.l.EndPoint.add(App.Vector(0.0,0.0,0.0))
 
     @QtCore.Slot()
     def M_CAL_MAG(self):
