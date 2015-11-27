@@ -77,16 +77,36 @@ class PhSetParametros(QtCore.QObject):
             self.doc = App.newDocument("Parametros")
 
         self.dbConnect()
-
-        self.l = Part.Line()
-        self.l.StartPoint = App.Vector(0.0,0.0,0.0)
+        self.desp = 50
+        #Sistema de referencia general
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(10,0,0))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,10,0))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,0,10))
         
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(40,0,0))
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,40,0))
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,0,40))
+        #Sistema de referencia del Magnetometro
+        Draft.makeLine(App.Vector(self.desp,self.desp,0),App.Vector(40+self.desp,self.desp,0))
+        Draft.makeLine(App.Vector(self.desp,self.desp,0),App.Vector(self.desp,40+self.desp,0))
+        Draft.makeLine(App.Vector(self.desp,self.desp,0),App.Vector(self.desp,self.desp,40))
+        Draft.makeLine(App.Vector(self.desp,self.desp,0),App.Vector(10+self.desp,10+self.desp,10))
+        
+        #Sistema de referencia del Accelerometro
+        Draft.makeLine(App.Vector(-self.desp,-self.desp,0),App.Vector(40-self.desp,-self.desp,0))
+        Draft.makeLine(App.Vector(-self.desp,-self.desp,0),App.Vector(-self.desp,40-self.desp,0))
+        Draft.makeLine(App.Vector(-self.desp,-self.desp,0),App.Vector(-self.desp,-self.desp,40))
+        Draft.makeLine(App.Vector(-self.desp,-self.desp,0),App.Vector(10-self.desp,10-self.desp,10))
+        
+        #Sistema de referencia del Giroscopo
+        Draft.makeLine(App.Vector(0,0,self.desp),App.Vector(40,0,self.desp))
+        Draft.makeLine(App.Vector(0,0,self.desp),App.Vector(0,40,self.desp))
+        Draft.makeLine(App.Vector(0,0,self.desp),App.Vector(0,0,40+self.desp))
+        Draft.makeLine(App.Vector(0,0,self.desp),App.Vector(10,10,10+self.desp))
+        
+        
         #App.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxometric()
+        
+        #Coloreado de sistema de referencia general
         Gui.getDocument(self.doc.Label).getObject("Line").LineColor = (1.00,0.00,0.00)
         Gui.getDocument(self.doc.Label).getObject("Line001").LineColor = (0.00,1.00,0.00)
         Gui.getDocument(self.doc.Label).getObject("Line002").LineColor = (0.00,0.00,1.00)
@@ -94,20 +114,38 @@ class PhSetParametros(QtCore.QObject):
         Gui.getDocument(self.doc.Label).getObject("Line001").PointColor = (0.67,0.67,1.00)
         Gui.getDocument(self.doc.Label).getObject("Line002").PointColor = (0.67,0.67,1.00)
         
-        
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(10,0,0))
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,10,0))
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,0,10))
-        
-        Gui.getDocument(self.doc.Label).getObject("Line003").LineColor = (1.00,1.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line004").LineColor = (0.00,1.00,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line005").LineColor = (1.00,0.00,1.00)
+        #Coloreado de sistema de referencia del Magnetometro
+        Gui.getDocument(self.doc.Label).getObject("Line003").LineColor = (1.00,0.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line004").LineColor = (0.00,1.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line005").LineColor = (0.00,0.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line006").LineColor = (1.00,1.00,0.00)
         Gui.getDocument(self.doc.Label).getObject("Line003").PointColor = (0.67,0.67,1.00)
         Gui.getDocument(self.doc.Label).getObject("Line004").PointColor = (0.67,0.67,1.00)
         Gui.getDocument(self.doc.Label).getObject("Line005").PointColor = (0.67,0.67,1.00)
-         
+        Gui.getDocument(self.doc.Label).getObject("Line006").PointColor = (0.67,0.67,1.00)
+        
+        #Coloreado de sistema de referencia del Acelerometro
+        Gui.getDocument(self.doc.Label).getObject("Line007").LineColor = (1.00,0.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line008").LineColor = (0.00,1.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line009").LineColor = (0.00,0.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line010").LineColor = (0.00,1.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line007").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line008").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line009").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line010").PointColor = (0.67,0.67,1.00)
+        
+        #Coloreado de sistema de referencia del Giroscopo
+        Gui.getDocument(self.doc.Label).getObject("Line011").LineColor = (1.00,0.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line012").LineColor = (0.00,1.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line013").LineColor = (0.00,0.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line014").LineColor = (1.00,0.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line011").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line012").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line013").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line014").PointColor = (0.67,0.67,1.00)
+        
         self.timer.timeout.connect(self.dibujarPunto)
-        self.timer.start(100)
+        #self.timer.start(100)
         
     def detenerProceso(self):
         #self.PuertoSerie.close()
@@ -125,9 +163,9 @@ class PhSetParametros(QtCore.QObject):
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
             self.dbInsert(v_mag, v_accel, v_gyr, t)
             
-            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_mag[0], v_mag[1], v_mag[2])
-            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_accel[0], v_accel[1], v_accel[2])
-            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_gyr[0], v_gyr[1], v_gyr[2])
+            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
+            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
+            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
 
     @QtCore.Slot()
     def M_CAL_MAG(self):
