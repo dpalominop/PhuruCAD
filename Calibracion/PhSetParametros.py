@@ -81,22 +81,33 @@ class PhSetParametros(QtCore.QObject):
         self.l = Part.Line()
         self.l.StartPoint = App.Vector(0.0,0.0,0.0)
         
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,0,40))
-        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,40,0))
         Draft.makeLine(App.Vector(0,0,0),App.Vector(40,0,0))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,40,0))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,0,40))
         #App.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxometric()
-        Gui.getDocument("Parametros").getObject("Line").LineColor = (0.00,0.00,1.00)
-        Gui.getDocument("Parametros").getObject("Line001").LineColor = (0.00,1.00,0.00)
-        Gui.getDocument("Parametros").getObject("Line002").LineColor = (1.00,0.00,0.00)
-        Gui.getDocument("Parametros").getObject("Line").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument("Parametros").getObject("Line001").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument("Parametros").getObject("Line002").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line").LineColor = (1.00,0.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line001").LineColor = (0.00,1.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line002").LineColor = (0.00,0.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line001").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line002").PointColor = (0.67,0.67,1.00)
         
         
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(10,0,0))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,10,0))
+        Draft.makeLine(App.Vector(0,0,0),App.Vector(0,0,10))
+        
+        Gui.getDocument(self.doc.Label).getObject("Line003").LineColor = (1.00,1.00,0.00)
+        Gui.getDocument(self.doc.Label).getObject("Line004").LineColor = (0.00,1.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line005").LineColor = (1.00,0.00,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line003").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line004").PointColor = (0.67,0.67,1.00)
+        Gui.getDocument(self.doc.Label).getObject("Line005").PointColor = (0.67,0.67,1.00)
+         
         self.timer.timeout.connect(self.dibujarPunto)
-        #self.timer.start(100)
+        self.timer.start(100)
         
     def detenerProceso(self):
         #self.PuertoSerie.close()
@@ -114,10 +125,9 @@ class PhSetParametros(QtCore.QObject):
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
             self.dbInsert(v_mag, v_accel, v_gyr, t)
             
-            #self.l.EndPoint = App.Vector(float(x),float(y),float(z))
-            #self.doc.addObject("Part::Feature","Line").Shape = self.l.toShape() 
-            #self.doc.recompute()
-            #self.l.StartPoint = self.l.EndPoint.add(App.Vector(0.0,0.0,0.0))
+            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_mag[0], v_mag[1], v_mag[2])
+            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_accel[0], v_accel[1], v_accel[2])
+            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_gyr[0], v_gyr[1], v_gyr[2])
 
     @QtCore.Slot()
     def M_CAL_MAG(self):
@@ -136,7 +146,7 @@ class PhSetParametros(QtCore.QObject):
         filename = "phuru.db"
         database =  QFile(filename)
         if not database.exists():
-            qDebug("Database not found. Creating and opening")
+            App.Console.PrintMessage("Database not found. Creating and opening")
             self.db.setDatabaseName(filename)
             self.db.open()
             self.query = QSqlQuery()
@@ -153,7 +163,7 @@ class PhSetParametros(QtCore.QObject):
                         "gyr_z float(4), "
                         "time float(4)")
         else:
-            qDebug("Database found. Opening")
+            App.Console.PrintMessage("Database found. Opening")
             self.db.setDatabaseName(filename)
             self.db.open()
             
