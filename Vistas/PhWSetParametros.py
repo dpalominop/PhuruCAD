@@ -35,6 +35,7 @@ class PhWSetParametros(QtGui.QWidget):
 
         self.retranslateUi()
         #QtCore.QMetaObject.connectSlotsByName(Form)
+        QtCore.QObject.connect(self.Salir, QtCore.SIGNAL("pressed()"), self.cancelar)
 
     def retranslateUi(self):
         #Form.setWindowTitle(QtGui.QApplication.translate("Form", "CALIBRAR SENSORES", None, QtGui.QApplication.UnicodeUTF8))
@@ -46,6 +47,7 @@ class PhWSetParametros(QtGui.QWidget):
 
     def cancelar(self):
         self.close()
+        self.windowFinished.emit()
     
     def aceptar(self):
         self.close()
