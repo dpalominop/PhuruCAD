@@ -11,6 +11,8 @@ from PySide.QtSql import *
 import FreeCADGui as Gui
 import FreeCAD as App
 import Part, Draft
+from scipy.optimize import leastsq
+import numpy as np
 
 from Vistas.PhWSetParametros import *
 from Socket.PhCliente import *
@@ -77,7 +79,7 @@ class PhSetParametros(QtCore.QObject):
             self.doc = App.newDocument("Parametros")
 
         self.dbConnect()
-        self.desp = 50
+        self.desp = 80
         #Sistema de referencia general
         Draft.makeLine(App.Vector(0,0,0),App.Vector(10,0,0))
         Draft.makeLine(App.Vector(0,0,0),App.Vector(0,10,0))
@@ -169,7 +171,17 @@ class PhSetParametros(QtCore.QObject):
 
     @QtCore.Slot()
     def M_CAL_MAG(self):
-        pass
+        file = open('magn.txt', 'r')
+        coords = []
+        for line in file:
+            coords+=[map(float,line.split(" "))]
+        
+        coords=np.array(coords)
+        
+        p0 = np.concatenate(((coords.max(axis=0)+coords.min(axis=0))/2, (coords.max(axis=0)-coords.min(axis=0))/2), axis=0)
+        errfunc = lambda p,x: fitfunc(p,x)-1
+        p, flag = leastsq(errfunc,p0,args=(coords,))
+        print p
     
     @QtCore.Slot()
     def M_CAL_ACC(self):
@@ -199,7 +211,7 @@ class PhSetParametros(QtCore.QObject):
                         "gyr_x float(4), "
                         "gyr_y float(4), "
                         "gyr_z float(4), "
-                        "time float(4)")
+                        "time float(4))")
         else:
             App.Console.PrintMessage("Database found. Opening")
             self.db.setDatabaseName(filename)
@@ -208,6 +220,7 @@ class PhSetParametros(QtCore.QObject):
         return self.db.isOpen()
     
     def dbInsert(self, v_mag, v_accel, v_gyr, t):
+        self.query = QSqlQuery()
         self.query.prepare("insert into ph_sensors "
                           "(mag_x, mag_x, mag_x, accel_x, accel_y, accel_z, gyr_x, gyr_y, gyr_z, time) " 
                           "values(:mag_x, :mag_y, :mag_z, :accel_x :accel_y :accel_z, :gyr_x, :gyr_y, :gyr_z, :time)")
