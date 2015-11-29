@@ -49,6 +49,7 @@ class PhSetParametros(QtCore.QObject):
         self.socket = PhCliente()
         
         self.wCalibracion = PhWSetParametros()
+        self.enableCommandos(False)
         
         QtCore.QObject.connect(self.wCalibracion.SetMagnetometro, 
                                QtCore.SIGNAL("pressed()"), 
@@ -65,15 +66,24 @@ class PhSetParametros(QtCore.QObject):
                                self, 
                                QtCore.SLOT("INIT_CONT()"))
         
+        QtCore.QObject.connect(self.wCalibracion.Iniciar,
+                               QtCore.SIGNAL("pressed()"),
+                               self,
+                               QtCore.SLOT("IniciarProceso()"))
+        
+        QtCore.QObject.connect(self.wCalibracion.Detener,
+                               QtCore.SIGNAL("pressed()"),
+                               self,
+                               QtCore.SLOT("PausarProceso()"))
+        
         QtCore.QObject.connect(self.wCalibracion,
                                QtCore.SIGNAL("windowFinished()"),
                                self,
-                               QtCore.SLOT("detenerProceso()"))
+                               QtCore.SLOT("FinalizarProceso()"))
         
         self.crearVista()
         self.dbCreate()
         self.timer.timeout.connect(self.dibujarPunto)
-        self.timer.start(100)
         
     def crearVista(self):
         self.doc = App.activeDocument()
@@ -144,14 +154,6 @@ class PhSetParametros(QtCore.QObject):
         Gui.getDocument(self.doc.Label).getObject("Line012").PointColor = (0.67,0.67,1.00)
         Gui.getDocument(self.doc.Label).getObject("Line013").PointColor = (0.67,0.67,1.00)
         Gui.getDocument(self.doc.Label).getObject("Line014").PointColor = (0.67,0.67,1.00)
-
-    @QtCore.Slot()
-    def detenerProceso(self):
-        App.Console.PrintMessage("Finalizando timer ...\n")
-        self.timer.stop()
-        self.timer.deleteLater()
-        App.Console.PrintMessage("Good Bye!\n")
-        self.deleteLater()
     
     def dibujarPunto(self):
         rmsg = self.socket.sendCommand(1, 5, "")
@@ -177,7 +179,7 @@ class PhSetParametros(QtCore.QObject):
                     if not self.timer.isActive():
                         self.timer.start(100)
                         
-                    self.enableButtons(True)
+                    self.enableCommandos(True)
 
     def enviarParamteros(self, p):
         v_max_min = struct.pack("ffffff", 
@@ -188,19 +190,19 @@ class PhSetParametros(QtCore.QObject):
         while rmsg["rsucces"]:
             rmsg = self.socket.sendCommand(1, 8, v_max_min)
 
-    def enableButtons(self, val):
+    def enableCommandos(self, val):
         if val:
-            self.wCalibracion.SetMagnetometro.isEnabled(True)
-            self.wCalibracion.SetAcelerometro.isEnabled(True)
-            self.wCalibracion.SetGiroscopo.isEnabled(True)
+            self.wCalibracion.SetMagnetometro.setEnabled(True)
+            self.wCalibracion.SetAcelerometro.setEnabled(True)
+            self.wCalibracion.SetGiroscopo.setEnabled(True)
         else:
-            self.wCalibracion.SetMagnetometro.isEnabled(False)
-            self.wCalibracion.SetAcelerometro.isEnabled(False)
-            self.wCalibracion.SetGiroscopo.isEnabled(False)
+            self.wCalibracion.SetMagnetometro.setEnabled(False)
+            self.wCalibracion.SetAcelerometro.setEnabled(False)
+            self.wCalibracion.SetGiroscopo.setEnabled(False)
 
     @QtCore.Slot()
     def INIT_CONT(self):
-        self.enableButtons(False)
+        self.enableCommandos(False)
         self.dbCreateTable()
         self.grabar = True
         self.cont = 0
@@ -314,6 +316,27 @@ class PhSetParametros(QtCore.QObject):
         q.next()
         
         return q.value(num)
+
+    @QtCore.Slot()
+    def FinalizarProceso(self):
+        App.Console.PrintMessage("Finalizando timer ...\n")
+        self.timer.stop()
+        self.timer.deleteLater()
+        App.Console.PrintMessage("Good Bye!\n")
+        #self.deleteLater()
+        
+    @QtCore.Slot()
+    def IniciarProceso(self):
+        App.Console.PrintMessage("Iniciando timer ...\n")
+        self.timer.start(100)
+        self.enableCommandos(True)
+    
+    @QtCore.Slot()
+    def PausarProceso(self):
+        App.Console.PrintMessage("Pausando timer ...\n")
+        self.timer.stop()
+        #self.timer.deleteLater()
+        
 
 Gui.addCommand('SET_PARAMETROS_CALIBRACION', PhSetParametros())
 
