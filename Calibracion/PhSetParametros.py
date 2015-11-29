@@ -306,16 +306,17 @@ class PhSetParametros(QtCore.QObject):
     
     def dbSelect(self, campo, tabla):
         q = QSqlQuery("""select {0}_x as A, {0}_y as B, 
-                      {0}_z as C from {1}""".format(campo, tabla))
+                      {0}_z as C from {1}""".format("mag", "ph_sensors"))
         rec = q.record()
         
         A = rec.indexOf("A")
         B = rec.indexOf("B")
         C = rec.indexOf("C")
         
-        q.next()
-        
-        return [[A[i], B[i], C[i]] for i in range(len(A))]
+        resp = []
+        while q.next():
+            resp.append([q.value(A), q.value(B), q.value(C)])
+        return resp
 
 Gui.addCommand('SET_PARAMETROS_CALIBRACION', PhSetParametros())
 
