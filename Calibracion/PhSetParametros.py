@@ -17,9 +17,8 @@ import numpy as np
 from Vistas.PhWSetParametros import *
 from Socket.PhCliente import *
 from Vistas.PhWSetParametros import *
+from twisted.test.testutils import returnConnected
 
-#def computeHash(original):
-#    return QCryptographicHash.hash(QString(original).toUtf8(), QCryptographicHash.Md5).toHex()
 
 # Estimar parametros
 def fitfunc(p,coords):
@@ -27,13 +26,13 @@ def fitfunc(p,coords):
     x,y,z=coords.T
     return ((x-x0)/a)**2+((y-y0)/b)**2+((z-z0)/c)**2
 
-
 class PhSetParametros(QtCore.QObject):
     """Settear parametros de los sensores"""
     
     cal_mag = QtCore.Signal()
     cal_acc = QtCore.Signal()
     cal_gyr = QtCore.Signal()
+    tabla   = ""
     
     def GetResources(self):
         return {"MenuText": "&SET PARAMETROS DE CALIBRACION",
@@ -46,8 +45,6 @@ class PhSetParametros(QtCore.QObject):
         return True
 
     def Activated(self):
-        
-        #app = QtCore.QCoreApplication(sys.argv)
         self.timer = QtCore.QTimer()
         self.socket = PhCliente()
         
@@ -73,16 +70,15 @@ class PhSetParametros(QtCore.QObject):
                                self,
                                QtCore.SLOT("detenerProceso()"))
         
-        self.iniciarProceso()
-        #self.wConfiguracion.connect(QtCore.SIGNAL("windowFinished()"), QtCore.SLOT("iniciarProceso()"))
+        self.crearVista()
+        self.dbCreate()
+        self.timer.timeout.connect(self.dibujarPunto)
+        self.timer.start(100)
         
-    @QtCore.Slot()
-    def iniciarProceso(self):
+    def crearVista(self):
         self.doc = App.activeDocument()
         if self.doc == None:
             self.doc = App.newDocument("Parametros")
-
-        self.dbCreate()
         self.desp = 80
         #Sistema de referencia general
         Draft.makeLine(App.Vector(0,0,0),App.Vector(10,0,0))
@@ -106,7 +102,6 @@ class PhSetParametros(QtCore.QObject):
         Draft.makeLine(App.Vector(0,0,self.desp),App.Vector(0,40,self.desp))
         Draft.makeLine(App.Vector(0,0,self.desp),App.Vector(0,0,40+self.desp))
         Draft.makeLine(App.Vector(0,0,self.desp),App.Vector(10,10,10+self.desp))
-        
         
         #App.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
@@ -149,10 +144,7 @@ class PhSetParametros(QtCore.QObject):
         Gui.getDocument(self.doc.Label).getObject("Line012").PointColor = (0.67,0.67,1.00)
         Gui.getDocument(self.doc.Label).getObject("Line013").PointColor = (0.67,0.67,1.00)
         Gui.getDocument(self.doc.Label).getObject("Line014").PointColor = (0.67,0.67,1.00)
-        
-        self.timer.timeout.connect(self.dibujarPunto)
-        self.timer.start(100)
-        
+
     @QtCore.Slot()
     def detenerProceso(self):
         App.Console.PrintMessage("Finalizando timer ...\n")
@@ -162,9 +154,6 @@ class PhSetParametros(QtCore.QObject):
         self.deleteLater()
     
     def dibujarPunto(self):
-        #if self.PuertoSerie == None:
-        #    return
-        #else:
         rmsg = self.socket.sendCommand(1, 5, "")
         App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
@@ -181,25 +170,22 @@ class PhSetParametros(QtCore.QObject):
                     self.grabar = False
                     p = self.M_CAL_MAG()
                     
-                    #vectormax = [p[0]+p[3], p[1]+p[4], p[2]+p[5]]
-                    #vectormin = [p[0]-p[3], p[1]-p[4], p[2]-p[5]]
+                    v_max_min = struct.pack("ffffff", 
+                                p[0]+p[3],p[1]+p[4],p[2]+p[5],
+                                p[0]-p[3],p[1]-p[4],p[2]-p[5])
                     
-                    v_max_min = struct.pack("ffffff",
-                                            p[0]+p[3],p[1]+p[4],p[2]+p[5],
-                                            p[0]-p[3],p[1]-p[4],p[2]-p[5])
-                    
-                    rmsg = self.socket.sendCommand(1, 5, v_max_min)
+                    rmsg = self.socket.sendCommand(1, 8, v_max_min)
                     while rmsg["rsucces"]:
-                        rmsg = self.socket.sendCommand(1, 5, v_max_min)
-                    
+                        rmsg = self.socket.sendCommand(1, 8, v_max_min)
+                        
                     if not self.timer.isActive():
                         self.timer.start(100)
                         
                     self.enableButtons(True)
             
-            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
-            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
-            Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
+            Gui.getDocument(self.doc.Label).getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
+            Gui.getDocument(self.doc.Label).getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
+            Gui.getDocument(self.doc.Label).getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
 
     def enableButtons(self, val):
         if val:
@@ -214,8 +200,9 @@ class PhSetParametros(QtCore.QObject):
     @QtCore.Slot()
     def INIT_CONT(self):
         self.enableButtons(False)
-        self.cont = 0
+        self.dbCreateTable()
         self.grabar = True
+        self.cont = 0
 
     @QtCore.Slot()
     def M_CAL_MAG(self):      
@@ -247,35 +234,32 @@ class PhSetParametros(QtCore.QObject):
         self.db = QSqlDatabase.addDatabase("QSQLITE")
         filename = "phuru.db"
         database =  QFile(filename)
-        if not database.exists():
-            App.Console.PrintMessage("Database not found. Creating and opening")
-            self.db.setDatabaseName(filename)
-            self.db.open()
-            self.query = QSqlQuery()
-            self.query.exec_("create table ph_sensors "
-                        "(id integer primary key autoincrement, "
-                        "mag_x float(4), "
-                        "mag_y float(4), "
-                        "mag_z float(4), "
-                        "accel_x float(4), "
-                        "accel_y float(4), "
-                        "accel_z float(4), "
-                        "gyr_x float(4), "
-                        "gyr_y float(4), "
-                        "gyr_z float(4), "
-                        "time float(4))")
-        else:
-            App.Console.PrintMessage("Database found. Opening")
-            self.db.setDatabaseName(filename)
-            self.db.open()
-            
+        self.db.setDatabaseName(filename)
+        self.db.open()
+
         return self.db.isOpen()
+    
+    def dbCreateTable(self):
+        self.tabla = "ph_sensors_" + self.dbCalcularNumTablas()
+        self.query = QSqlQuery()
+        self.query.exec_("""create table {0}
+                        (id integer primary key autoincrement,
+                        mag_x float(4),
+                        mag_y float(4),
+                        mag_z float(4),
+                        accel_x float(4),
+                        accel_y float(4),
+                        accel_z float(4),
+                        gyr_x float(4),
+                        gyr_y float(4),
+                        gyr_z float(4),
+                        time float(4))""".format(self.tabla))
     
     def dbInsert(self, v_mag, v_accel, v_gyr, t):
         self.query = QSqlQuery()
-        self.query.prepare("insert into ph_sensors "
-                          "(mag_x, mag_x, mag_x, accel_x, accel_y, accel_z, gyr_x, gyr_y, gyr_z, time) " 
-                          "values(:mag_x, :mag_y, :mag_z, :accel_x :accel_y :accel_z, :gyr_x, :gyr_y, :gyr_z, :time)")
+        self.query.prepare("""insert into {0}
+                          (mag_x, mag_x, mag_x, accel_x, accel_y, accel_z, gyr_x, gyr_y, gyr_z, time) 
+                          values(:mag_x, :mag_y, :mag_z, :accel_x :accel_y :accel_z, :gyr_x, :gyr_y, :gyr_z, :time)""".format(self.tabla))
                             
         self.query.bindValue(":mag_x", v_mag[0])
         self.query.bindValue(":mag_y", v_mag[1])
@@ -290,10 +274,10 @@ class PhSetParametros(QtCore.QObject):
         
         self.query.exec_()
         
-    def dbSelectMaxMin(self, campo, tabla):
+    def dbSelectMaxMin(self, campo):
         q = QSqlQuery("""select max({0}_x) as A, max({0}_y) as B, 
                       max({0}_z) as C, min({0}_x) as D, min({0}_x) as E, 
-                      min({0}_x) as F from {1}""".format(campo, tabla))
+                      min({0}_x) as F from {1}""".format(campo, self.tabla))
         
         rec = q.record()
         
@@ -308,9 +292,9 @@ class PhSetParametros(QtCore.QObject):
             
         return [[q.value(A), q.value(B), q.value(C)], [q.value(D), q.value(E),q.value(F)]]
     
-    def dbSelect(self, campo, tabla):
+    def dbSelect(self, campo):
         q = QSqlQuery("""select {0}_x as A, {0}_y as B, 
-                      {0}_z as C from {1}""".format("mag", "ph_sensors"))
+                      {0}_z as C from {1}""".format(campo, self.tabla))
         rec = q.record()
         
         A = rec.indexOf("A")
@@ -321,6 +305,14 @@ class PhSetParametros(QtCore.QObject):
         while q.next():
             resp.append([q.value(A), q.value(B), q.value(C)])
         return resp
+    
+    def dbCalcularNumTablas(self):
+        q = QSqlQuery("SELECT Count(*) AS NUM FROM information_schema.tables")
+        rec = q.record()
+        num = rec.indexOf("NUM")
+        q.next()
+        
+        return q.value(num)
 
 Gui.addCommand('SET_PARAMETROS_CALIBRACION', PhSetParametros())
 
