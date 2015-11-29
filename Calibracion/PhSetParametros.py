@@ -31,6 +31,10 @@ def fitfunc(p,coords):
 class PhSetParametros(QtCore.QObject):
     """Settear parametros de los sensores"""
     
+    cal_mag = QtCore.Signal()
+    cal_acc = QtCore.Signal()
+    cal_gyr = QtCore.Signal()
+    
     def GetResources(self):
         return {"MenuText": "&SET PARAMETROS DE CALIBRACION",
                        "Accel": "Ctrl+N",
@@ -52,22 +56,22 @@ class PhSetParametros(QtCore.QObject):
         QtCore.QObject.connect(self.wCalibracion.SetMagnetometro, 
                                QtCore.SIGNAL("pressed()"), 
                                self, 
-                               QtCore.SLOT("M_CAL_MAG()"))
+                               QtCore.SLOT("INIT_CONT()"))
         
         QtCore.QObject.connect(self.wCalibracion.SetAcelerometro, 
                                QtCore.SIGNAL("pressed()"), 
                                self, 
-                               QtCore.SLOT("M_CAL_ACC()"))
+                               QtCore.SLOT("INIT_CONT()"))
         
         QtCore.QObject.connect(self.wCalibracion.SetGiroscopo, 
                                QtCore.SIGNAL("pressed()"), 
                                self, 
-                               QtCore.SLOT("M_CAL_GYR()"))
+                               QtCore.SLOT("INIT_CONT()"))
         
-        QtCore.QObject.connect(self.wCalibracion.Salir,
-                               QtCore.SIGNAL("pressed()"),
+        QtCore.QObject.connect(self.wCalibracion,
+                               QtCore.SIGNAL("windowFinished()"),
                                self,
-                               QtCore.SLOT("exit()"))
+                               QtCore.SLOT("detenerProceso()"))
         
         self.iniciarProceso()
         #self.wConfiguracion.connect(QtCore.SIGNAL("windowFinished()"), QtCore.SLOT("iniciarProceso()"))
@@ -78,7 +82,7 @@ class PhSetParametros(QtCore.QObject):
         if self.doc == None:
             self.doc = App.newDocument("Parametros")
 
-        self.dbConnect()
+        self.dbCreate()
         self.desp = 80
         #Sistema de referencia general
         Draft.makeLine(App.Vector(0,0,0),App.Vector(10,0,0))
@@ -147,12 +151,15 @@ class PhSetParametros(QtCore.QObject):
         Gui.getDocument(self.doc.Label).getObject("Line014").PointColor = (0.67,0.67,1.00)
         
         self.timer.timeout.connect(self.dibujarPunto)
-        #self.timer.start(100)
+        self.timer.start(100)
         
+    @QtCore.Slot()
     def detenerProceso(self):
-        #self.PuertoSerie.close()
-        #self.PuertoSerie = None
-        pass
+        App.Console.PrintMessage("Finalizando timer ...\n")
+        self.timer.stop()
+        self.timer.deleteLater()
+        App.Console.PrintMessage("Good Bye!\n")
+        self.deleteLater()
     
     def dibujarPunto(self):
         #if self.PuertoSerie == None:
@@ -163,25 +170,66 @@ class PhSetParametros(QtCore.QObject):
         
         if rmsg["rsucces"]:
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
-            self.dbInsert(v_mag, v_accel, v_gyr, t)
+            
+            if self.grabar:
+                self.dbInsert(v_mag, v_accel, v_gyr, t) 
+                self.cont = self.cont + 1
+                
+                if self.cont == 200:
+                    self.timer.stop()
+                    self.cont = 0
+                    self.grabar = False
+                    p = self.M_CAL_MAG()
+                    
+                    vectormax = [p[0]+p[3], p[1]+p[4], p[2]+p[5]]
+                    vectormin = [p[0]-p[3], p[1]-p[4], p[2]-p[5]]
+                    
+                    rmsg = self.socket.sendCommand(1, 5, [vectormax, vectormin])
+                    while rmsg[""]:
+                        rmsg = self.socket.sendCommand(1, 5, [vectormax, vectormin])
+                    
+                    if not self.timer.isActive():
+                        self.timer.start(100)
+                        
+                    self.enableButtons(True)
             
             Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
             Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
             Gui.getDocument(self.doc.Label).getObject("Line003").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
 
+    def enableButtons(self, val):
+        if val:
+            self.wCalibracion.SetMagnetometro.isEnabled(True)
+            self.wCalibracion.SetAcelerometro.isEnabled(True)
+            self.wCalibracion.SetGiroscopo.isEnabled(True)
+        else:
+            self.wCalibracion.SetMagnetometro.isEnabled(False)
+            self.wCalibracion.SetAcelerometro.isEnabled(False)
+            self.wCalibracion.SetGiroscopo.isEnabled(False)
+
     @QtCore.Slot()
-    def M_CAL_MAG(self):
-        file = open('magn.txt', 'r')
-        coords = []
-        for line in file:
-            coords+=[map(float,line.split(" "))]
+    def INIT_CONT(self):
+        self.enableButtons(False)
+        self.cont = 0
+        self.grabar = True
+
+    @QtCore.Slot()
+    def M_CAL_MAG(self):      
         
+        coords = self.dbSelect("mag", "ph_sensors")
         coords=np.array(coords)
         
-        p0 = np.concatenate(((coords.max(axis=0)+coords.min(axis=0))/2, (coords.max(axis=0)-coords.min(axis=0))/2), axis=0)
+        coords_max, coords_min = self.dbSelectMaxMin("mag", "ph_sensors")
+        media = (coords_max + coords_min)/2
+        diff = (coords_max - coords_min)/2
+        
+        p0 = media + diff
+        p0 = np.array(p0)
+        
         errfunc = lambda p,x: fitfunc(p,x)-1
         p, flag = leastsq(errfunc,p0,args=(coords,))
-        print p
+        
+        return p
     
     @QtCore.Slot()
     def M_CAL_ACC(self):
@@ -191,7 +239,7 @@ class PhSetParametros(QtCore.QObject):
     def M_CAL_GYR(self):
         pass
     
-    def dbConnect(self):
+    def dbCreate(self):
         self.db = QSqlDatabase.addDatabase("QSQLITE")
         filename = "phuru.db"
         database =  QFile(filename)
@@ -205,9 +253,9 @@ class PhSetParametros(QtCore.QObject):
                         "mag_x float(4), "
                         "mag_y float(4), "
                         "mag_z float(4), "
-                        "accel_x float(4)), "
-                        "accel_y float(4)), "
-                        "accel_z float(4)), "
+                        "accel_x float(4), "
+                        "accel_y float(4), "
+                        "accel_z float(4), "
                         "gyr_x float(4), "
                         "gyr_y float(4), "
                         "gyr_z float(4), "
@@ -237,6 +285,37 @@ class PhSetParametros(QtCore.QObject):
         self.query.bindValue(":time", t)
         
         self.query.exec_()
+        
+    def dbSelectMaxMin(self, campo, tabla):
+        q = QSqlQuery("""select max({0}_x) as A, max({0}_y) as B, 
+                      max({0}_z) as C, min({0}_x) as D, min({0}_x) as E, 
+                      min({0}_x) as F from {1}""".format(campo, tabla))
+        
+        rec = q.record()
+        
+        A = rec.indexOf("A")
+        B = rec.indexOf("B")
+        C = rec.indexOf("C")
+        D = rec.indexOf("D")
+        E = rec.indexOf("E")
+        F = rec.indexOf("F")
+        
+        q.next() 
+            
+        return [[q.value(A), q.value(B), q.value(C)], [q.value(D), q.value(E),q.value(F)]]
+    
+    def dbSelect(self, campo, tabla):
+        q = QSqlQuery("""select {0}_x as A, {0}_y as B, 
+                      {0}_z as C from {1}""".format(campo, tabla))
+        rec = q.record()
+        
+        A = rec.indexOf("A")
+        B = rec.indexOf("B")
+        C = rec.indexOf("C")
+        
+        q.next()
+        
+        return [[A[i], B[i], C[i]] for i in range(len(A))]
 
 Gui.addCommand('SET_PARAMETROS_CALIBRACION', PhSetParametros())
 

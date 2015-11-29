@@ -10,6 +10,7 @@
 from PySide import QtCore, QtGui
 
 class PhWSetParametros(QtGui.QWidget):
+    windowFinished = QtCore.Signal()
     def __init__(self):
         super(PhWSetParametros, self).__init__()
         self.setupUi()
