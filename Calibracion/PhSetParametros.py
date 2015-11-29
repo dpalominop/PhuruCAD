@@ -160,6 +160,10 @@ class PhSetParametros(QtCore.QObject):
         if rmsg["rsucces"]:
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
             
+            Gui.getDocument(self.doc.Label).getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
+            Gui.getDocument(self.doc.Label).getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
+            Gui.getDocument(self.doc.Label).getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
+            
             if self.grabar:
                 self.dbInsert(v_mag, v_accel, v_gyr, t) 
                 self.cont = self.cont + 1
@@ -168,24 +172,21 @@ class PhSetParametros(QtCore.QObject):
                     self.timer.stop()
                     self.cont = 0
                     self.grabar = False
-                    p = self.M_CAL_MAG()
-                    
-                    v_max_min = struct.pack("ffffff", 
-                                p[0]+p[3],p[1]+p[4],p[2]+p[5],
-                                p[0]-p[3],p[1]-p[4],p[2]-p[5])
-                    
-                    rmsg = self.socket.sendCommand(1, 8, v_max_min)
-                    while rmsg["rsucces"]:
-                        rmsg = self.socket.sendCommand(1, 8, v_max_min)
+                    self.enviarParamteros(self.M_CAL_MAG())
                         
                     if not self.timer.isActive():
                         self.timer.start(100)
                         
                     self.enableButtons(True)
-            
-            Gui.getDocument(self.doc.Label).getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
-            Gui.getDocument(self.doc.Label).getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
-            Gui.getDocument(self.doc.Label).getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
+
+    def enviarParamteros(self, p):
+        v_max_min = struct.pack("ffffff", 
+                                p[0]+p[3],p[1]+p[4],p[2]+p[5],
+                                p[0]-p[3],p[1]-p[4],p[2]-p[5])
+                    
+        rmsg = self.socket.sendCommand(1, 8, v_max_min)
+        while rmsg["rsucces"]:
+            rmsg = self.socket.sendCommand(1, 8, v_max_min)
 
     def enableButtons(self, val):
         if val:

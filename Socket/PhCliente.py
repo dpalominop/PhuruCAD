@@ -212,22 +212,28 @@ class PhCliente(QTcpSocket):
                                         struct.unpack('f', rcv_msg["rdata"][32:36])[0]],
                                         
                                         struct.unpack('f', rcv_msg["rdata"][36:40])[0]]
-                
-                elif (cmd ==  6):
-                    pass
                     
-                elif (cmd ==  7) and (rcv_msg["rlen"] == 18):
+                elif (cmd ==  6) and (rcv_msg["rlen"] == 18):
                     rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
                                         struct.unpack('f', rcv_msg["rdata"][4:8])[0],
                                         struct.unpack('f', rcv_msg["rdata"][8:12])[0],
                                         struct.unpack('f', rcv_msg["rdata"][12:16])[0]]
                 
-                elif (cmd ==  8) and (rcv_msg["rlen"] == 14):
+                elif (cmd ==  7) and (rcv_msg["rlen"] == 14):
                     rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][0:4])[0],
                                         struct.unpack('f', rcv_msg["rdata"][4:8])[0],
                                         struct.unpack('f', rcv_msg["rdata"][8:12])[0]]
                 
+                elif (cmd ==  8):
+                    pass
+                
                 elif (cmd ==  9):
+                    pass
+                
+                elif (cmd ==  10):
+                    pass
+                
+                elif (cmd ==  11):
                     pass
                 
             self.close()
