@@ -210,10 +210,10 @@ class PhSetParametros(QtCore.QObject):
     @QtCore.Slot()
     def M_CAL_MAG(self):      
         
-        coords = self.dbSelect("mag", "ph_sensors")
+        coords = self.dbSelect("mag", self.tabla)
         coords=np.array(coords)
         
-        coords_max, coords_min = self.dbSelectMaxMin("mag", "ph_sensors")
+        coords_max, coords_min = self.dbSelectMaxMin("mag", self.tabla)
         media = (coords_max + coords_min)/2
         diff = (coords_max - coords_min)/2
         
@@ -319,7 +319,7 @@ class PhSetParametros(QtCore.QObject):
 
     @QtCore.Slot()
     def FinalizarProceso(self):
-        App.Console.PrintMessage("Finalizando timer ...\n")
+        App.Console.PrintMessage("Finalizando Proceso ...\n")
         self.timer.stop()
         self.timer.deleteLater()
         App.Console.PrintMessage("Good Bye!\n")
@@ -327,13 +327,13 @@ class PhSetParametros(QtCore.QObject):
         
     @QtCore.Slot()
     def IniciarProceso(self):
-        App.Console.PrintMessage("Iniciando timer ...\n")
+        App.Console.PrintMessage("Iniciando Proceso ...\n")
         self.timer.start(100)
         self.enableCommandos(True)
     
     @QtCore.Slot()
     def PausarProceso(self):
-        App.Console.PrintMessage("Pausando timer ...\n")
+        App.Console.PrintMessage("Pausando Proceso ...\n")
         self.timer.stop()
         #self.timer.deleteLater()
         
