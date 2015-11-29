@@ -181,12 +181,16 @@ class PhSetParametros(QtCore.QObject):
                     self.grabar = False
                     p = self.M_CAL_MAG()
                     
-                    vectormax = [p[0]+p[3], p[1]+p[4], p[2]+p[5]]
-                    vectormin = [p[0]-p[3], p[1]-p[4], p[2]-p[5]]
+                    #vectormax = [p[0]+p[3], p[1]+p[4], p[2]+p[5]]
+                    #vectormin = [p[0]-p[3], p[1]-p[4], p[2]-p[5]]
                     
-                    rmsg = self.socket.sendCommand(1, 5, [vectormax, vectormin])
-                    while rmsg[""]:
-                        rmsg = self.socket.sendCommand(1, 5, [vectormax, vectormin])
+                    v_max_min = struct.pack("ffffff",
+                                            p[0]+p[3],p[1]+p[4],p[2]+p[5],
+                                            p[0]-p[3],p[1]-p[4],p[2]-p[5])
+                    
+                    rmsg = self.socket.sendCommand(1, 5, v_max_min)
+                    while rmsg["rsucces"]:
+                        rmsg = self.socket.sendCommand(1, 5, v_max_min)
                     
                     if not self.timer.isActive():
                         self.timer.start(100)
