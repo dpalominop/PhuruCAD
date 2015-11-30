@@ -12,7 +12,7 @@ import Part, Draft
 import math
 
 from Socket.PhCliente import *
-#from Calibracion.PhGiroscopo import *
+from Vistas.PhWControlOrientacion import *
 
 class PhControlOrientacion(QtCore.QObject):
     """Iniciar y detener envio de datos por WIFI"""
@@ -29,16 +29,57 @@ class PhControlOrientacion(QtCore.QObject):
         return True
 
     def Activated(self):
-        if self.start:
-            self.iniciarProceso()
-            self.start = False
-        else:
-            self.detenerProceso()
-            self.start = True
+        self.wControlOrientacion = PhWControlOrientacion()
+        self.wControlOrientacion.Pausar.setEnabled(False)
         
+        QtCore.QObject.connect(self.wControlOrientacion.Iniciar, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("IniciarProceso()"))
+        
+        QtCore.QObject.connect(self.wControlOrientacion.Pausar, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("PausarProceso()"))
+        
+        QtCore.QObject.connect(self.wControlOrientacion, 
+                               QtCore.SIGNAL("windowFinished()"), 
+                               self, 
+                               QtCore.SLOT("DetenerProceso()"))
+        self.crearVista()
         
     @QtCore.Slot()
-    def iniciarProceso(self):
+    def IniciarProceso(self):
+        App.Console.PrintMessage("Iniciado Proceso ...\n")
+        self.wControlOrientacion.Iniciar.setEnabled(False)
+        self.wControlOrientacion.Pausar.setEnabled(True)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.controlGiro)
+        self.timer.start(100)
+        self.socket = PhCliente()
+        App.Console.PrintMessage("Proceso Iniciado\n")
+       
+    @QtCore.Slot() 
+    def PausarProceso(self):
+        App.Console.PrintMessage("Pausando Proceso ...\n")
+        self.wControlOrientacion.Iniciar.setEnabled(True)
+        self.wControlOrientacion.Pausar.setEnabled(False)
+        self.timer.stop()
+        self.timer.disconnect()
+        self.timer.deleteLater()
+        self.socket.deleteLater()
+        App.Console.PrintMessage("Proceso Pausado.\n")
+        
+    @QtCore.Slot()
+    def DetenerProceso(self):
+        App.Console.PrintMessage("Finalizando Proceso ...\n")
+        self.timer.stop()
+        self.timer.disconnect()
+        self.timer.deleteLater()
+        self.socket.deleteLater()
+        App.Console.PrintMessage("Proceso Finalizado.\n")
+        
+    def crearVista(self):
         self.doc = App.activeDocument()
         if self.doc == None:
             self.doc = App.newDocument("PhGyroscope")
@@ -62,17 +103,6 @@ class PhControlOrientacion(QtCore.QObject):
         Gui.getDocument("PhGyroscope").getObject("Line001").PointColor = (0.67,0.67,1.00)
         Gui.getDocument("PhGyroscope").getObject("Line002").PointColor = (0.67,0.67,1.00)
         
-        
-        self.timer = QtCore.QTimer()
-        self.socket = PhCliente()
-        self.timer.timeout.connect(self.controlGiro)
-        self.timer.start(100)
-        
-    def detenerProceso(self):
-        self.timer.disconnect()
-        self.timer.stop()
-        self.timer.killTimer()
-    
     def controlGiro(self):
         rmsg = self.socket.sendCommand(1, 7, "CUCHAROS")
         

@@ -17,7 +17,6 @@ import numpy as np
 from Vistas.PhWSetParametros import *
 from Socket.PhCliente import *
 from Vistas.PhWSetParametros import *
-from twisted.test.testutils import returnConnected
 
 
 # Estimar parametros
@@ -45,11 +44,10 @@ class PhSetParametros(QtCore.QObject):
         return True
 
     def Activated(self):
-        self.timer = QtCore.QTimer()
-        self.socket = PhCliente()
-        
         self.wCalibracion = PhWSetParametros()
         self.enableCommandos(False)
+        self.wCalibracion.Iniciar.setEnabled(True)
+        self.wCalibracion.Detener.setEnabled(False)
         
         QtCore.QObject.connect(self.wCalibracion.SetMagnetometro, 
                                QtCore.SIGNAL("pressed()"), 
@@ -83,7 +81,6 @@ class PhSetParametros(QtCore.QObject):
         
         self.crearVista()
         self.dbCreate()
-        self.timer.timeout.connect(self.dibujarPunto)
         
     def crearVista(self):
         self.doc = App.activeDocument()
@@ -321,21 +318,34 @@ class PhSetParametros(QtCore.QObject):
     def FinalizarProceso(self):
         App.Console.PrintMessage("Finalizando Proceso ...\n")
         self.timer.stop()
+        self.timer.disconnect()
+        self.timer.killTimer()
         self.timer.deleteLater()
-        App.Console.PrintMessage("Good Bye!\n")
+        self.socket.deleteLater()
+        App.Console.PrintMessage("Proceso Finalizado\n")
         #self.deleteLater()
         
     @QtCore.Slot()
     def IniciarProceso(self):
         App.Console.PrintMessage("Iniciando Proceso ...\n")
+        self.socket = PhCliente()
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.dibujarPunto)
         self.timer.start(100)
         self.enableCommandos(True)
+        self.wCalibracion.Iniciar.setEnabled(False)
+        self.wCalibracion.Detener.setEnabled(True)
+        App.Console.PrintMessage("Proceso Iniciado\n")
     
     @QtCore.Slot()
     def PausarProceso(self):
         App.Console.PrintMessage("Pausando Proceso ...\n")
         self.timer.stop()
-        #self.timer.deleteLater()
+        self.wCalibracion.Detener.setEnabled(False)
+        self.wCalibracion.Iniciar.setEnabled(True)
+        self.timer.deleteLater()
+        self.socket.deleteLater()
+        App.Console.PrintMessage("Proceso Pausado\n")
         
 
 Gui.addCommand('SET_PARAMETROS_CALIBRACION', PhSetParametros())
