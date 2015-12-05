@@ -104,8 +104,8 @@ class PhControlOrientacion(QtCore.QObject):
         Gui.getDocument("PhGyroscope").getObject("Line002").PointColor = (0.67,0.67,1.00)
         
     def controlGiro(self):
-        rmsg = self.socket.sendCommand(1, 7, "CUCHAROS")
-        
+        rmsg = self.socket.sendCommand(1, 6, "CUCHAROS")
+        App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         if rmsg["rsucces"]:
             #yaw,pitch,roll = rmsg["rdata"]
             q0, q1, q2, q3 = rmsg["rdata"]
@@ -116,6 +116,8 @@ class PhControlOrientacion(QtCore.QObject):
                                                                          App.Vector(10,10,10))
             #App.ActiveDocument.recompute()
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
+        else:
+            App.Console.PrintMessage("rerror: " + str(rmsg["rerror"]) + "\n")
             
     def quat2Euler(self, q0, q1, q2, q3):
         
