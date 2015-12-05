@@ -13,6 +13,7 @@ import FreeCAD as App
 import Part, Draft
 from scipy.optimize import leastsq
 import numpy as np
+import os
 
 from Vistas.PhWSetParametros import *
 from Socket.PhCliente import *
@@ -179,7 +180,7 @@ class PhSetParametros(QtCore.QObject):
                         
                     self.enableCommandos(True)
             else:
-              App.Console.PrintMessage("rdata: " + str(rmsg["rerror"]) + "\n")
+                App.Console.PrintMessage("rdata: " + str(rmsg["rerror"]) + "\n")
 
     def enviarParamteros(self, p):
         v_max_min = struct.pack("ffffff", 
@@ -235,7 +236,8 @@ class PhSetParametros(QtCore.QObject):
     
     def dbCreate(self):
         self.db = QSqlDatabase.addDatabase("QSQLITE")
-        filename = "phuru.db"
+        filename = os.path.dirname(os.path.abspath(__file__)) + "/../phuru.db"
+        App.Console.PrintMessage("rpath: " + filename + "\n")
         database =  QFile(filename)
         self.db.setDatabaseName(filename)
         self.db.open()
