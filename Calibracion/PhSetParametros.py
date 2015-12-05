@@ -160,6 +160,10 @@ class PhSetParametros(QtCore.QObject):
         if rmsg["rsucces"]:
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
+            App.Console.PrintMessage("v_mag: " + str(rmsg["rdata"][0]) + "\n")
+            App.Console.PrintMessage("v_accel: " + str(rmsg["rdata"][1]) + "\n")
+            App.Console.PrintMessage("v_gyr: " + str(rmsg["rdata"][2]) + "\n")
+            App.Console.PrintMessage("tiempo: " + str(rmsg["rdata"][3]) + "\n")
             
             Gui.getDocument(self.doc.Label).getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
             Gui.getDocument(self.doc.Label).getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
@@ -179,8 +183,8 @@ class PhSetParametros(QtCore.QObject):
                         self.timer.start(100)
                         
                     self.enableCommandos(True)
-            else:
-                App.Console.PrintMessage("rerror: " + str(rmsg["rerror"]) + "\n")
+        else:
+            App.Console.PrintMessage("rerror: " + str(rmsg["rerror"]) + "\n")
 
     def enviarParamteros(self, p):
         v_max_min = struct.pack("ffffff", 
