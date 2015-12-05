@@ -180,7 +180,7 @@ class PhSetParametros(QtCore.QObject):
                         
                     self.enableCommandos(True)
             else:
-                App.Console.PrintMessage("rdata: " + str(rmsg["rerror"]) + "\n")
+                App.Console.PrintMessage("rerror: " + str(rmsg["rerror"]) + "\n")
 
     def enviarParamteros(self, p):
         v_max_min = struct.pack("ffffff", 
