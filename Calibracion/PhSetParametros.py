@@ -154,9 +154,10 @@ class PhSetParametros(QtCore.QObject):
     
     def dibujarPunto(self):
         rmsg = self.socket.sendCommand(1, 5, "")
-        App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
+        #App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
         if rmsg["rsucces"]:
+            App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
             
             Gui.getDocument(self.doc.Label).getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
@@ -177,6 +178,8 @@ class PhSetParametros(QtCore.QObject):
                         self.timer.start(100)
                         
                     self.enableCommandos(True)
+            else:
+              App.Console.PrintMessage("rdata: " + str(rmsg["rerror"]) + "\n")
 
     def enviarParamteros(self, p):
         v_max_min = struct.pack("ffffff", 
