@@ -88,7 +88,7 @@ class PhSetParametros(QtCore.QObject):
                                QtCore.SLOT("FinalizarProceso()"))
         
         self.crearVista()
-        self.dbCreate()
+        self.dbCrear()
         
     def crearVista(self):
         self.Document = App.newDocument("PhCalibrarSensores")
@@ -218,22 +218,23 @@ class PhSetParametros(QtCore.QObject):
     @QtCore.Slot()
     def INIT_CONT(self):
         self.enableCommandos(False)
-        self.dbCreateTable()
+        self.dbCrearTabla()
         self.grabar = True
         self.cont = 0
 
     @QtCore.Slot()
-    def M_CAL_MAG(self):      
+    def M_CAL_MAG(self):
+        coords = self.dbSelect("mag")
+        coords = np.array(coords)
         
-        coords = self.dbSelect("mag", self.tabla)
-        coords=np.array(coords)
-        
-        coords_max, coords_min = self.dbSelectMaxMin("mag", self.tabla)
+        coords_max, coords_min = self.dbSelectMaxMin("mag")
+        coords_max = np.array(coords_max)
+        coords_min = np.array(coords_min)
         media = (coords_max + coords_min)/2
         diff = (coords_max - coords_min)/2
         
         p0 = media + diff
-        p0 = np.array(p0)
+        #p0 = np.array(p0)
         
         errfunc = lambda p,x: fitfunc(p,x)-1
         p, flag = leastsq(errfunc,p0,args=(coords,))
@@ -248,7 +249,7 @@ class PhSetParametros(QtCore.QObject):
     def M_CAL_GYR(self):
         pass
     
-    def dbCreate(self):
+    def dbCrear(self):
         self.db = QSqlDatabase.addDatabase("QSQLITE")
         filename = os.path.dirname(os.path.abspath(__file__)) + "/../phuru.db"
         App.Console.PrintMessage("rpath: " + filename + "\n")
@@ -258,7 +259,7 @@ class PhSetParametros(QtCore.QObject):
 
         return self.db.isOpen()
     
-    def dbCreateTable(self):
+    def dbCrearTabla(self):
         self.tabla = "ph_sensors_" + self.dbCalcularNumTablas()
         self.query = QSqlQuery(self.db)
         self.query.exec_("""create table {0}
