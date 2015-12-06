@@ -227,14 +227,15 @@ class PhSetParametros(QtCore.QObject):
         coords = self.dbSelect("mag")
         coords = np.array(coords)
         
-        coords_max, coords_min = self.dbSelectMaxMin("mag")
-        coords_max = np.array(coords_max)
-        coords_min = np.array(coords_min)
-        media = (coords_max + coords_min)/2
-        diff = (coords_max - coords_min)/2
+        #coords_max, coords_min = self.dbSelectMaxMin("mag")
+        #coords_max = np.array(coords_max)
+        #coords_min = np.array(coords_min)
+        #media = (coords_max + coords_min)/2
+        #diff = (coords_max - coords_min)/2
         
-        p0 = media + diff
+        #p0 = media + diff
         #p0 = np.array(p0)
+        p0 = np.concatenate(((coords.max(axis=0)+coords.min(axis=0))/2, (coords.max(axis=0)-coords.min(axis=0))/2), axis=0)
         
         errfunc = lambda p,x: fitfunc(p,x)-1
         p, flag = leastsq(errfunc,p0,args=(coords,))
