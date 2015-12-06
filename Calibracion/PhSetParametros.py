@@ -258,7 +258,7 @@ class PhSetParametros(QtCore.QObject):
     
     def dbCreateTable(self):
         self.tabla = "ph_sensors_" + self.dbCalcularNumTablas()
-        self.query = QSqlQuery()
+        self.query = QSqlQuery(self.db)
         self.query.exec_("""create table {0}
                         (id integer primary key autoincrement,
                         mag_x float(4),
@@ -273,10 +273,10 @@ class PhSetParametros(QtCore.QObject):
                         time float(4))""".format(self.tabla))
     
     def dbInsert(self, v_mag, v_accel, v_gyr, t):
-        self.query = QSqlQuery()
-        self.query.prepare("""insert into {0}
-                          (mag_x, mag_x, mag_x, accel_x, accel_y, accel_z, gyr_x, gyr_y, gyr_z, time) 
-                          values(:mag_x, :mag_y, :mag_z, :accel_x :accel_y :accel_z, :gyr_x, :gyr_y, :gyr_z, :time)""".format(self.tabla))
+        self.query = QSqlQuery(self.db)
+        self.query.prepare("""insert into {0}  
+                          (mag_x, mag_y, mag_z, accel_x, accel_y, accel_z, gyr_x, gyr_y, gyr_z, time) 
+                          values (:mag_x, :mag_y, :mag_z, :accel_x, :accel_y, :accel_z, :gyr_x, :gyr_y, :gyr_z, :time)""".format(self.tabla))
                             
         self.query.bindValue(":mag_x", v_mag[0])
         self.query.bindValue(":mag_y", v_mag[1])
