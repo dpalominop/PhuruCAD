@@ -297,8 +297,8 @@ class PhSetParametros(QtCore.QObject):
         
     def dbSelectMaxMin(self, campo):
         q = QSqlQuery("""select max({0}_x) as A, max({0}_y) as B, 
-                      max({0}_z) as C, min({0}_x) as D, min({0}_x) as E, 
-                      min({0}_x) as F from {1}""".format(campo, self.tabla))
+                      max({0}_z) as C, min({0}_x) as D, min({0}_y) as E, 
+                      min({0}_z) as F from {1}""".format(campo, self.tabla))
         
         rec = q.record()
         
