@@ -185,7 +185,7 @@ class PhSetParametros(QtCore.QObject):
                     self.timer.stop()
                     self.cont = 0
                     self.grabar = False
-                    self.enviarParamteros(self.M_CAL_MAG())
+                    self.enviarParametros(self.M_CAL_MAG())
                         
                     if not self.timer.isActive():
                         self.timer = QtCore.QTimer()
@@ -196,7 +196,8 @@ class PhSetParametros(QtCore.QObject):
         else:
             App.Console.PrintMessage("rerror: " + str(rmsg["rerror"]) + "\n")
 
-    def enviarParamteros(self, p):
+    def enviarParametros(self, p):
+        p = p.tolist()
         v_max_min = struct.pack("ffffff", 
                                 p[0]+p[3],p[1]+p[4],p[2]+p[5],
                                 p[0]-p[3],p[1]-p[4],p[2]-p[5])
