@@ -1,7 +1,8 @@
 '''
 Created on 5/11/2015
 
-@author: dpalominop
+@author: Daniel Palomino
+@contact: dpalomino@phuru.io
 '''
 
 from PySide import QtCore
@@ -113,7 +114,8 @@ class PhControlOrientacion(QtCore.QObject):
             q0, q1, q2, q3 = rmsg["rdata"]
             yaw,pitch,roll = self.quat2Euler(q0, q1, q2, q3)
             
-            App.getDocument(self.nameDoc).Box.Placement=App.Placement(App.Vector(0,0,0), 
+            App.ActiveDocument = self.Document
+            self.Document.Box.Placement=App.Placement(App.Vector(0,0,0), 
                                                                          App.Rotation(yaw, pitch, roll),
                                                                          App.Vector(10,10,10))
             #App.ActiveDocument.recompute()

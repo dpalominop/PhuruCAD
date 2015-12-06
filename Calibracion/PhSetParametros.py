@@ -1,7 +1,8 @@
 '''
 Created on 12/11/2015
 
-@author: dpalominop
+@author: Daniel Palomino
+@contact: dpalomino@phuru.io
 '''
 
 #from PySide import QtCore
@@ -313,12 +314,14 @@ class PhSetParametros(QtCore.QObject):
         return resp
     
     def dbCalcularNumTablas(self):
-        q = QSqlQuery("SELECT Count(*) AS NUM FROM information_schema.tables")
-        rec = q.record()
-        num = rec.indexOf("NUM")
-        q.next()
-        
-        return q.value(num)
+        try:
+            q = QSqlQuery("SELECT Count(*) AS NUM FROM information_schema.tables")
+            rec = q.record()
+            num = rec.indexOf("NUM")
+            q.next()
+            return q.value(num)
+        except:
+            return 1
 
     @QtCore.Slot()
     def FinalizarProceso(self):
