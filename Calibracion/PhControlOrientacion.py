@@ -80,28 +80,29 @@ class PhControlOrientacion(QtCore.QObject):
         App.Console.PrintMessage("Proceso Finalizado.\n")
         
     def crearVista(self):
-        self.doc = App.activeDocument()
-        if self.doc == None:
-            self.doc = App.newDocument("PhGyroscope")
+        self.Document = App.newDocument("PhGyroscope")
+        self.GuiDocument = Gui.getDocument(self.Document.Name)
+        App.ActiveDocument = self.Document
+        Gui.ActiveDocument = self.GuiDocument
         
-        App.ActiveDocument.addObject("Part::Box","Box")
-        App.ActiveDocument.ActiveObject.Label = "Box"
-        App.getDocument("PhGyroscope").getObject("Box").Width = '20 mm'
-        App.getDocument("PhGyroscope").getObject("Box").Length = '20 mm'
-        App.getDocument("PhGyroscope").getObject("Box").Height = '20 mm'
+        self.Document.addObject("Part::Box","Box")
+        self.Document.ActiveObject.Label = "Box"
+        self.Document.getObject("Box").Width = '20 mm'
+        self.Document.getObject("Box").Length = '20 mm'
+        self.Document.getObject("Box").Height = '20 mm'
         Draft.makeLine(App.Vector(10,10,10),App.Vector(10,10,50))
         Draft.makeLine(App.Vector(10,10,10),App.Vector(10,50,10))
         Draft.makeLine(App.Vector(10,10,10),App.Vector(50,10,10))
         #App.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
-        Gui.activeDocument().activeView().viewAxometric()
+        self.GuiDocument.activeView().viewAxometric()
         
-        Gui.getDocument("PhGyroscope").getObject("Line").LineColor = (0.00,0.00,1.00)
-        Gui.getDocument("PhGyroscope").getObject("Line001").LineColor = (0.00,1.00,0.00)
-        Gui.getDocument("PhGyroscope").getObject("Line002").LineColor = (1.00,0.00,0.00)
-        Gui.getDocument("PhGyroscope").getObject("Line").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument("PhGyroscope").getObject("Line001").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument("PhGyroscope").getObject("Line002").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line").LineColor = (0.00,0.00,1.00)
+        self.GuiDocument.getObject("Line001").LineColor = (0.00,1.00,0.00)
+        self.GuiDocument.getObject("Line002").LineColor = (1.00,0.00,0.00)
+        self.GuiDocument.getObject("Line").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line001").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line002").PointColor = (0.67,0.67,1.00)
         
     def controlGiro(self):
         rmsg = self.socket.sendCommand(1, 6, "CUCHAROS")
@@ -111,7 +112,7 @@ class PhControlOrientacion(QtCore.QObject):
             q0, q1, q2, q3 = rmsg["rdata"]
             yaw,pitch,roll = self.quat2Euler(q0, q1, q2, q3)
             
-            App.getDocument("PhGyroscope").Box.Placement=App.Placement(App.Vector(0,0,0), 
+            App.getDocument(self.nameDoc).Box.Placement=App.Placement(App.Vector(0,0,0), 
                                                                          App.Rotation(yaw, pitch, roll),
                                                                          App.Vector(10,10,10))
             #App.ActiveDocument.recompute()

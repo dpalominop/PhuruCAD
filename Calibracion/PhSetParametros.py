@@ -84,9 +84,11 @@ class PhSetParametros(QtCore.QObject):
         self.dbCreate()
         
     def crearVista(self):
-        self.doc = App.activeDocument()
-        if self.doc == None:
-            self.doc = App.newDocument("Parametros")
+        self.Document = App.newDocument("SetParametros")
+        self.GuiDocument = Gui.getDocument(self.Document.Name)
+        App.ActiveDocument = self.Document
+        Gui.ActiveDocument = self.GuiDocument
+        
         self.desp = 80
         #Sistema de referencia general
         Draft.makeLine(App.Vector(0,0,0),App.Vector(10,0,0))
@@ -113,61 +115,56 @@ class PhSetParametros(QtCore.QObject):
         
         #App.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
-        Gui.activeDocument().activeView().viewAxometric()
+        self.GuiDocument.activeView().viewAxometric()
         
         #Coloreado de sistema de referencia general
-        Gui.getDocument(self.doc.Label).getObject("Line").LineColor = (1.00,0.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line001").LineColor = (0.00,1.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line002").LineColor = (0.00,0.00,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line001").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line002").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line").LineColor = (1.00,0.00,0.00)
+        self.GuiDocument.getObject("Line001").LineColor = (0.00,1.00,0.00)
+        self.GuiDocument.getObject("Line002").LineColor = (0.00,0.00,1.00)
+        self.GuiDocument.getObject("Line").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line001").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line002").PointColor = (0.67,0.67,1.00)
         
         #Coloreado de sistema de referencia del Magnetometro
-        Gui.getDocument(self.doc.Label).getObject("Line003").LineColor = (1.00,0.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line004").LineColor = (0.00,1.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line005").LineColor = (0.00,0.00,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line006").LineColor = (1.00,1.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line003").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line004").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line005").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line006").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line003").LineColor = (1.00,0.00,0.00)
+        self.GuiDocument.getObject("Line004").LineColor = (0.00,1.00,0.00)
+        self.GuiDocument.getObject("Line005").LineColor = (0.00,0.00,1.00)
+        self.GuiDocument.getObject("Line006").LineColor = (1.00,1.00,0.00)
+        self.GuiDocument.getObject("Line003").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line004").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line005").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line006").PointColor = (0.67,0.67,1.00)
         
         #Coloreado de sistema de referencia del Acelerometro
-        Gui.getDocument(self.doc.Label).getObject("Line007").LineColor = (1.00,0.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line008").LineColor = (0.00,1.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line009").LineColor = (0.00,0.00,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line010").LineColor = (0.00,1.00,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line007").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line008").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line009").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line010").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line007").LineColor = (1.00,0.00,0.00)
+        self.GuiDocument.getObject("Line008").LineColor = (0.00,1.00,0.00)
+        self.GuiDocument.getObject("Line009").LineColor = (0.00,0.00,1.00)
+        self.GuiDocument.getObject("Line010").LineColor = (0.00,1.00,1.00)
+        self.GuiDocument.getObject("Line007").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line008").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line009").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line010").PointColor = (0.67,0.67,1.00)
         
         #Coloreado de sistema de referencia del Giroscopo
-        Gui.getDocument(self.doc.Label).getObject("Line011").LineColor = (1.00,0.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line012").LineColor = (0.00,1.00,0.00)
-        Gui.getDocument(self.doc.Label).getObject("Line013").LineColor = (0.00,0.00,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line014").LineColor = (1.00,0.00,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line011").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line012").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line013").PointColor = (0.67,0.67,1.00)
-        Gui.getDocument(self.doc.Label).getObject("Line014").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line011").LineColor = (1.00,0.00,0.00)
+        self.GuiDocument.getObject("Line012").LineColor = (0.00,1.00,0.00)
+        self.GuiDocument.getObject("Line013").LineColor = (0.00,0.00,1.00)
+        self.GuiDocument.getObject("Line014").LineColor = (1.00,0.00,1.00)
+        self.GuiDocument.getObject("Line011").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line012").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line013").PointColor = (0.67,0.67,1.00)
+        self.GuiDocument.getObject("Line014").PointColor = (0.67,0.67,1.00)
     
     def dibujarPunto(self):
         rmsg = self.socket.sendCommand(1, 5, "")
-        #App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
         if rmsg["rsucces"]:
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
-            App.Console.PrintMessage("v_mag: " + str(rmsg["rdata"][0]) + "\n")
-            App.Console.PrintMessage("v_accel: " + str(rmsg["rdata"][1]) + "\n")
-            App.Console.PrintMessage("v_gyr: " + str(rmsg["rdata"][2]) + "\n")
-            App.Console.PrintMessage("tiempo: " + str(rmsg["rdata"][3]) + "\n")
             
-            Gui.getDocument(self.doc.Label).getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
-            Gui.getDocument(self.doc.Label).getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
-            Gui.getDocument(self.doc.Label).getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
+            self.GuiDocument.getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
+            self.GuiDocument.getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
+            self.GuiDocument.getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
             
             if self.grabar:
                 self.dbInsert(v_mag, v_accel, v_gyr, t) 
