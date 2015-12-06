@@ -325,13 +325,13 @@ class PhSetParametros(QtCore.QObject):
     
     def dbCalcularNumTablas(self):
         try:
-            q = QSqlQuery("SELECT Count(*) AS NUM FROM information_schema.tables")
+            q = QSqlQuery("SELECT Count(*) AS NUM FROM sqlite_master")
             rec = q.record()
             num = rec.indexOf("NUM")
             q.next()
             return str(q.value(num))
         except:
-            return "1"
+            return "0"
 
     @QtCore.Slot()
     def FinalizarProceso(self):
