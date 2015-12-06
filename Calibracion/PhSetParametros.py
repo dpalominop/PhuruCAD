@@ -250,7 +250,7 @@ class PhSetParametros(QtCore.QObject):
         self.db = QSqlDatabase.addDatabase("QSQLITE")
         filename = os.path.dirname(os.path.abspath(__file__)) + "/../phuru.db"
         App.Console.PrintMessage("rpath: " + filename + "\n")
-        database =  QFile(filename)
+        #database =  QFile(filename)
         self.db.setDatabaseName(filename)
         self.db.open()
 
@@ -329,9 +329,9 @@ class PhSetParametros(QtCore.QObject):
             rec = q.record()
             num = rec.indexOf("NUM")
             q.next()
-            return q.value(num)
+            return str(q.value(num))
         except:
-            return 1
+            return "1"
 
     @QtCore.Slot()
     def FinalizarProceso(self):
