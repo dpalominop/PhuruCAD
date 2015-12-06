@@ -189,6 +189,7 @@ class PhSetParametros(QtCore.QObject):
                         
                     if not self.timer.isActive():
                         self.timer = QtCore.QTimer()
+                        self.timer.timeout.connect(self.dibujarPunto)
                         self.timer.start(100)
                         
                     self.enableCommandos(True)
