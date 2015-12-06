@@ -105,8 +105,9 @@ class PhControlOrientacion(QtCore.QObject):
         self.GuiDocument.getObject("Line002").PointColor = (0.67,0.67,1.00)
         
     def controlGiro(self):
-        rmsg = self.socket.sendCommand(1, 6, "CUCHAROS")
-        App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
+        rmsg = self.socket.sendCommand(1, 6, "")
+        #App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
+        
         if rmsg["rsucces"]:
             #yaw,pitch,roll = rmsg["rdata"]
             q0, q1, q2, q3 = rmsg["rdata"]
