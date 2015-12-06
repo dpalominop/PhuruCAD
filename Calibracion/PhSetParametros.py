@@ -188,6 +188,7 @@ class PhSetParametros(QtCore.QObject):
                     self.enviarParamteros(self.M_CAL_MAG())
                         
                     if not self.timer.isActive():
+                        self.timer = QtCore.QTimer()
                         self.timer.start(100)
                         
                     self.enableCommandos(True)
