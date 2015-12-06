@@ -19,6 +19,7 @@ import os
 from Vistas.PhWSetParametros import *
 from Socket.PhCliente import *
 from Vistas.PhWSetParametros import *
+from atk import Document
 
 
 # Estimar parametros
@@ -163,9 +164,10 @@ class PhSetParametros(QtCore.QObject):
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
             
-            self.GuiDocument.getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
-            self.GuiDocument.getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
-            self.GuiDocument.getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
+            self.Document.getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
+            self.Document.getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
+            self.Document.getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
+            self.Document.recompute()
             
             if self.grabar:
                 self.dbInsert(v_mag, v_accel, v_gyr, t) 
