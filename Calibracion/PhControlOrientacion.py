@@ -80,7 +80,7 @@ class PhControlOrientacion(QtCore.QObject):
         App.Console.PrintMessage("Proceso Finalizado.\n")
         
     def crearVista(self):
-        self.Document = App.newDocument("PhGyroscope")
+        self.Document = App.newDocument("PhControlOrientacion")
         self.GuiDocument = Gui.getDocument(self.Document.Name)
         App.ActiveDocument = self.Document
         Gui.ActiveDocument = self.GuiDocument

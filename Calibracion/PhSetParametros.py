@@ -84,7 +84,7 @@ class PhSetParametros(QtCore.QObject):
         self.dbCreate()
         
     def crearVista(self):
-        self.Document = App.newDocument("SetParametros")
+        self.Document = App.newDocument("PhCalibrarSensores")
         self.GuiDocument = Gui.getDocument(self.Document.Name)
         App.ActiveDocument = self.Document
         Gui.ActiveDocument = self.GuiDocument
