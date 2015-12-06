@@ -28,6 +28,11 @@ def fitfunc(p,coords):
     x,y,z=coords.T
     return ((x-x0)/a)**2+((y-y0)/b)**2+((z-z0)/c)**2
 
+def normalizar(v, scale):
+    mod = (v[0]**2 + v[1]**2 + v[2]**2)**0.5
+    v = ((1/mod)*v[0]*scale, (1/mod)*v[1]*scale, (1/mod)*v[2]*scale)
+    return v
+
 class PhSetParametros(QtCore.QObject):
     """Settear parametros de los sensores"""
     
@@ -163,6 +168,9 @@ class PhSetParametros(QtCore.QObject):
         if rmsg["rsucces"]:
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
+            v_mag = normalizar(v_mag, 40)
+            v_accel = normalizar(v_accel, 40)
+            v_gyr = normalizar(v_gyr, 40)
             
             self.Document.getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
             self.Document.getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
