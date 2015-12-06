@@ -203,7 +203,7 @@ class PhSetParametros(QtCore.QObject):
                                 p[0]-p[3],p[1]-p[4],p[2]-p[5])
                     
         rmsg = self.socket.sendCommand(1, 8, v_max_min)
-        while rmsg["rsucces"]:
+        while not rmsg["rsucces"]:
             rmsg = self.socket.sendCommand(1, 8, v_max_min)
 
     def enableCommandos(self, val):
