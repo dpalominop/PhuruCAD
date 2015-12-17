@@ -75,7 +75,7 @@ class PhDashboard(QtCore.QObject):
         self.wDashboard.Pausar.setEnabled(True)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.actualizarVista())
-        #self.timer.start(100)
+        self.timer.start(100)
         self.socket = PhCliente()
         App.Console.PrintMessage("Proceso Iniciado\n")
        
