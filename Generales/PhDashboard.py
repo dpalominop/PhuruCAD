@@ -100,7 +100,7 @@ class PhDashboard(QtCore.QObject):
         App.Console.PrintMessage("Proceso Finalizado.\n")
         
     def actualizarVista(self):
-        rmsg = self.socket.sendCommand(1, 4, "")
+        rmsg = self.socket.sendCommand(1, 11, "")
         #App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
         
         if rmsg["rsucces"]:

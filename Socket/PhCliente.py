@@ -233,7 +233,13 @@ class PhCliente(QTcpSocket):
                 elif (cmd ==  10):
                     pass
                 
-                elif (cmd ==  11):
+                elif (cmd ==  11) and (rcv_msg["rlen"] == 19):
+                    rcv_msg["rdata"] = [ord(rcv_msg["rdata"][0]),
+                                        struct.unpack('f', rcv_msg["rdata"][1:5])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][5:9])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][9:13])[0],
+                                        struct.unpack('f', rcv_msg["rdata"][13:])[0]]
+                elif (cmd == 12):
                     pass
                 
             self.close()
