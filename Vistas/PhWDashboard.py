@@ -25,7 +25,7 @@ class PhWDashboard(QtGui.QWidget):
         self.Iniciar.setObjectName("Iniciar")
         self.Pausar = QtGui.QPushButton(self)
         self.Pausar.setGeometry(QtCore.QRect(140, 30, 111, 51))
-        self.Pausar.setObjectName("Parar")
+        self.Pausar.setObjectName("Pausar")
         self.Salir = QtGui.QPushButton(self)
         self.Salir.setGeometry(QtCore.QRect(138, 110, 111, 51))
         self.Salir.setObjectName("Salir")

@@ -9,7 +9,7 @@ import FreeCAD as App
 import Part, Draft
 import math
 
-from PySide import QtCore
+from PySide.QtCore import *
 from Vistas.PhWDashboard import *
 from Socket.PhCliente import *
 
@@ -74,7 +74,7 @@ class PhDashboard(QtCore.QObject):
         self.wDashboard.Iniciar.setEnabled(False)
         self.wDashboard.Pausar.setEnabled(True)
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.actualizarVista())
+        self.timer.timeout.connect(self.actualizarVista)
         self.timer.start(100)
         self.socket = PhCliente()
         App.Console.PrintMessage("Proceso Iniciado\n")
