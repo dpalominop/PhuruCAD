@@ -100,6 +100,7 @@ class PhComandos(QtCore.QObject):
         
         #self.wComandos.Extra.setEnabled(False)
         #self.wComandos.Valor.setEnabled(False)
+        self.wComandos.Respuesta.setReadOnly(True)
         
     @QtCore.Slot()
     def doReset(self):
