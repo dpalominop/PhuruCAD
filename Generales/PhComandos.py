@@ -29,52 +29,142 @@ class PhComandos(QtCore.QObject):
     def Activated(self):
         self.wComandos = PhWComandos()
         #self.wComandos.Pausar.setEnabled(False)
-        QtCore.QObject.connect(self.wComandos , 
+        QtCore.QObject.connect(self.wComandos.Reset, 
                                QtCore.SIGNAL("pressed()"), 
                                self, 
-                               QtCore.SLOT("IniciarProceso()"))
+                               QtCore.SLOT("doReset()"))
         
-        QtCore.QObject.connect(self.wComandos, 
+        QtCore.QObject.connect(self.wComandos.Version, 
                                QtCore.SIGNAL("pressed()"), 
                                self, 
-                               QtCore.SLOT("PausarProceso()"))
+                               QtCore.SLOT("doVersion()"))
         
-        QtCore.QObject.connect(self.wComandos, 
-                               QtCore.SIGNAL("windowFinished()"), 
+        QtCore.QObject.connect(self.wComandos.ACK, 
+                               QtCore.SIGNAL("pressed()"), 
                                self, 
-                               QtCore.SLOT("DetenerProceso()"))
+                               QtCore.SLOT("doACK()"))
+        
+        QtCore.QObject.connect(self.wComandos.Error, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doError()"))
+        
+        QtCore.QObject.connect(self.wComandos.Sensores, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doLeerSensores()"))
+        
+        QtCore.QObject.connect(self.wComandos.Euler, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doLeerEuler()"))
+        
+        QtCore.QObject.connect(self.wComandos.Quaterniobn, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doQuaternion()"))
+        
+        QtCore.QObject.connect(self.wComandos.Posicion, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doLeerPosicion()"))
+        
+        QtCore.QObject.connect(self.wComandos.Velocidad, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doLeerVelocidad()"))
+        
+        QtCore.QObject.connect(self.wComandos.Magnetometro, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doCalMag()"))
+        
+        QtCore.QObject.connect(self.wComandos.Acelerometro, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doCalAcel()"))
+        
+        QtCore.QObject.connect(self.wComandos.Giroscopo, 
+                               QtCore.SIGNAL("pressed()"), 
+                               self, 
+                               QtCore.SLOT("doCalGiros()"))
+        
 
+    @QtCore.Slot()
+    def doReset(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 1, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
+        self.socket.deleteLater()
     
     @QtCore.Slot()
-    def IniciarProceso(self):
-        App.Console.PrintMessage("Iniciado Proceso ...\n")
-        #self.wComandos.Iniciar.setEnabled(False)
-        #self.wComandos.Pausar.setEnabled(True)
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.actualizarVista)
-        self.timer.start(100)
+    def doVersion(self):
         self.socket = PhCliente()
-        App.Console.PrintMessage("Proceso Iniciado\n")
-       
-    @QtCore.Slot() 
-    def PausarProceso(self):
-        App.Console.PrintMessage("Pausando Proceso ...\n")
-        #self.wComandos.Iniciar.setEnabled(True)
-        s#elf.wComandos.Pausar.setEnabled(False)
-        self.timer.stop()
-        self.timer.disconnect()
-        self.timer.deleteLater()
+        rmsg = self.socket.sendCommand(1, 2, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
         self.socket.deleteLater()
-        App.Console.PrintMessage("Proceso Pausado.\n")
-        
+    
     @QtCore.Slot()
-    def DetenerProceso(self):
-        App.Console.PrintMessage("Finalizando Proceso ...\n")
-        self.timer.stop()
-        self.timer.disconnect()
-        self.timer.deleteLater()
+    def doACK(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 3, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
         self.socket.deleteLater()
-        App.Console.PrintMessage("Proceso Finalizado.\n")
+    
+    @QtCore.Slot()
+    def doError(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 12, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
+        self.socket.deleteLater()
+    
+    @QtCore.Slot()
+    def doLeerSensores(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 5, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
+        self.socket.deleteLater()
+    
+    @QtCore.Slot()
+    def doLeerEuler(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 7, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
+        self.socket.deleteLater()
+    
+    @QtCore.Slot()
+    def doQuaternion(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 6, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
+        self.socket.deleteLater()
+    
+    @QtCore.Slot()
+    def doLeerPosicion(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 11, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
+        self.socket.deleteLater()
+    
+    @QtCore.Slot()
+    def doLeerVelocidad(self):
+        self.socket = PhCliente()
+        rmsg = self.socket.sendCommand(1, 4, "")
+        self.wComandos.Respuesta.document().setPlainText(str(rmsg))
+        self.socket.deleteLater()
+    
+    @QtCore.Slot()
+    def doCalMag(self):
+        pass
+    
+    @QtCore.Slot()
+    def doCalAcel(self):
+        pass
+    
+    @QtCore.Slot()
+    def doCalGiros(self):
+        pass
+
         
 Gui.addCommand('COMANDOS', PhComandos())
 
