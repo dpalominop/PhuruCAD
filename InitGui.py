@@ -42,7 +42,7 @@ class PhuruWorkbench ( Workbench ):
 		#from Conectividad import PhWifiEjecucion
 		from Avanzado import PhConfiguracion
 		from Calibracion import PhControlOrientacion, PhSetParametros
-		from Generales import PhDashboard
+		from Generales import PhDashboard, PhComandos
 
 		#self.appendToolbar("PHURU", ["USB_Tool"])
 		#self.appendToolbar("PHURU", ["WIFI_Tool"])
@@ -51,7 +51,7 @@ class PhuruWorkbench ( Workbench ):
 		self.appendToolbar("PHURU", ["SET_PARAMETROS_CALIBRACION"])
 		#self.appendMenu(["PHURU", "&Conectividad"], ["WIFI_Tool", "WIFI_EXEC"])
 		self.appendMenu(["PHURU", "&Conectividad"],[])
-		self.appendMenu(["PHURU", "&Generales"], ["DASHBOARD"])
+		self.appendMenu(["PHURU", "&Generales"], ["DASHBOARD", "COMANDOS"])
 		self.appendMenu(["PHURU", "&Avanzado"], ["Separator", "Configuracion"])
 		self.appendMenu(["PHURU", "&Calibración"], 
 					["CONTROL_ORIENTACION", "SET_PARAMETROS_CALIBRACION"])
