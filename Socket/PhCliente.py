@@ -242,6 +242,10 @@ class PhCliente(QTcpSocket):
                 elif (cmd == 12):
                     pass
                 
+                else:
+                    num = rcv_msg["rlen"] - 2
+                    rcv_msg["rdata"] = [struct.unpack('f', rcv_msg["rdata"][4*i:4*i+4])[0] for i in range(num)]
+                
             self.close()
         
         else:
