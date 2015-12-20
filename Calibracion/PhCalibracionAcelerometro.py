@@ -32,6 +32,7 @@ class PhCalibracionAcelerometro(QtCore.QObject):
     def Activated(self):
         self.wCalibracionAcelerometro = PhWCalibracionAcelerometro()
         
+        
 Gui.addCommand('CALIBRACION_ACELEROMETRO', PhCalibracionAcelerometro())
 
 
