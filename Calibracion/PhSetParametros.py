@@ -168,13 +168,13 @@ class PhSetParametros(QtCore.QObject):
         if rmsg["rsucces"]:
             App.Console.PrintMessage("rdata: " + str(rmsg["rdata"]) + "\n")
             v_mag, v_accel, v_gyr, t = rmsg["rdata"]
-            v_mag = normalizar(v_mag, 40)
-            v_accel = normalizar(v_accel, 40)
-            v_gyr = normalizar(v_gyr, 40)
+            v_mag_n = normalizar(v_mag, 40)
+            v_accel_n = normalizar(v_accel, 40)
+            v_gyr_n = normalizar(v_gyr, 40)
             
-            self.Document.getObject("Line006").End = (v_mag[0]+self.desp, v_mag[1]+self.desp, v_mag[2])
-            self.Document.getObject("Line010").End = (v_accel[0]-self.desp, v_accel[1]-self.desp, v_accel[2])
-            self.Document.getObject("Line014").End = (v_gyr[0], v_gyr[1], v_gyr[2]+self.desp)
+            self.Document.getObject("Line006").End = (v_mag_n[0]+self.desp, v_mag_n[1]+self.desp, v_mag_n[2])
+            self.Document.getObject("Line010").End = (v_accel_n[0]-self.desp, v_accel_n[1]-self.desp, v_accel_n[2])
+            self.Document.getObject("Line014").End = (v_gyr_n[0], v_gyr_n[1], v_gyr_n[2]+self.desp)
             self.Document.recompute()
             
             if self.grabar:

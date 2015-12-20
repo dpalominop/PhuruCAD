@@ -5,17 +5,16 @@ Created on 19/12/2015
 @contact: dpalomino@phuru.ip
 '''
 
-from PySide import QtCore
+from PySide.QtCore import *
 from PySide.QtSql import *
 
 import FreeCADGui as Gui
 import FreeCAD as App
-import Part, Draft
-import math
 import os
 
 from Socket.PhCliente import *
 from Vistas.PhWCalibracionAcelerometro import *
+import Init
 
 class PhCalibracionAcelerometro(QtCore.QObject):
     """Iniciar y detener envio de datos por WIFI"""
@@ -38,6 +37,7 @@ class PhCalibracionAcelerometro(QtCore.QObject):
         self.wCalibracionAcelerometro.SALIR.setEnabled(True)
         
         self.dbCrearDB()
+        self.socket = PhCliente()
         
         QtCore.QObject.connect(self.wCalibracionAcelerometro.INICIAR, 
                                QtCore.SIGNAL("pressed()"), 
@@ -114,7 +114,20 @@ class PhCalibracionAcelerometro(QtCore.QObject):
           
     @QtCore.Slot()
     def calcularPromedioParcial(self):
-        prom = "EXITO"
+        i=0
+        while i!=200:
+            rmsg = self.socket.sendCommand(1, 5, "")
+            if rmsg["rsucces"]:
+                v_mag, v_accel, v_gyr, t = rmsg["rdata"]
+                self.dbInsert(v_mag, v_accel, v_gyr, t)
+                i=i+1
+            else:
+                App.Console.PrintMessage("rerror: " + str(rmsg["rerror"]) + "\n")
+               
+        fin = self.dbCalcularNumRegistros(self.tabla)
+        init = fin - 200
+        prom = str(self.dbSelectAvg(self.tabla, init, fin))
+        
         if self.wCalibracionAcelerometro.X_MENOS == self.sender():
             self.wCalibracionAcelerometro.PROM_X_MENOS.setText(prom)
         elif self.wCalibracionAcelerometro.X_MAS == self.sender():
@@ -127,14 +140,14 @@ class PhCalibracionAcelerometro(QtCore.QObject):
             self.wCalibracionAcelerometro.PROM_Z_MENOS.setText(prom)
         elif self.wCalibracionAcelerometro.Z_MAS == self.sender():
             self.wCalibracionAcelerometro.PROM_Z_MAS.setText(prom)
-
+    
     @QtCore.Slot()
     def onEnviarParametros(self):
         pass
     
     @QtCore.Slot()
     def onSalir(self):
-        pass
+        self.socket.deleteLater()
         
     def dbCrearDB(self):
         self.db = QSqlDatabase.addDatabase("QSQLITE")
@@ -199,6 +212,24 @@ class PhCalibracionAcelerometro(QtCore.QObject):
             
         return [[q.value(A), q.value(B), q.value(C)], [q.value(D), q.value(E),q.value(F)]]
     
+    def dbSelectAvg(self, nombre_tabla, init, fin):
+        try:
+            q = QSqlQuery("""SELECT AVG(ACCEL_X) AS AVG_X, 
+                            AVG(ACCEL_Y) AS AVG_Y, 
+                            AVG(ACCEL_Z) AS AVG_Z 
+                            FROM {0} WHERE ID>{1} AND ID <= {2};""".format(nombre_tabla, init, fin))
+            rec = q.record()
+            AVG_X = rec.indexOf("AVG_X")
+            AVG_Y = rec.indexOf("AVG_Y")
+            AVG_Z = rec.indexOf("AVG_Z")
+            
+            resp = []
+            while q.next():
+                resp.append([q.value(AVG_X), q.value(AVG_Y), q.value(AVG_Z)])
+            return resp[0]
+        except:
+            return [0.0, 0.0, 0.0]
+    
     def dbSelect(self, campo):
         q = QSqlQuery("""select {0}_x as A, {0}_y as B, 
                       {0}_z as C from {1}""".format(campo, self.tabla))
@@ -222,6 +253,16 @@ class PhCalibracionAcelerometro(QtCore.QObject):
             return str(q.value(num))
         except:
             return "0"
+        
+    def dbCalcularNumRegistros(self, nombre_tabla):
+        try:
+            q = QSqlQuery("SELECT Count(*) AS NUM FROM {0}".format(nombre_tabla))
+            rec = q.record()
+            num = rec.indexOf("NUM")
+            q.next()
+            return q.value(num)
+        except:
+            return 0
         
 Gui.addCommand('CALIBRACION_ACELEROMETRO', PhCalibracionAcelerometro())
 
