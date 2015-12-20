@@ -84,6 +84,12 @@ class PhCalibracionAcelerometro(QtCore.QObject):
                                self, 
                                QtCore.SLOT("onSalir()"))
         
+        self.wCalibracionAcelerometro.PROM_X_MENOS.setReadOnly(True)
+        self.wCalibracionAcelerometro.PROM_X_MAS.setReadOnly(True)
+        self.wCalibracionAcelerometro.PROM_Y_MENOS.setReadOnly(True)
+        self.wCalibracionAcelerometro.PROM_Y_MAS.setReadOnly(True)
+        self.wCalibracionAcelerometro.PROM_Z_MENOS.setReadOnly(True)
+        self.wCalibracionAcelerometro.PROM_Z_MAS.setReadOnly(True)
         
     def habilitarBotones(self, val):
         self.wCalibracionAcelerometro.X_MENOS.setEnabled(val)
