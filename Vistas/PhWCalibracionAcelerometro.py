@@ -72,7 +72,7 @@ class PhWCalibracionAcelerometro(QtGui.QWidget):
         #QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self):
-        self.setWindowTitle(QtGui.QApplication.translate("Form", "CALIBRAR MAGNETÓMETRO", None, QtGui.QApplication.UnicodeUTF8))
+        self.setWindowTitle(QtGui.QApplication.translate("Form", "CALIBRAR ACELERÓMETRO", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton.setText(QtGui.QApplication.translate("Form", "X-", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_2.setText(QtGui.QApplication.translate("Form", "X+", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_3.setText(QtGui.QApplication.translate("Form", "Y-", None, QtGui.QApplication.UnicodeUTF8))

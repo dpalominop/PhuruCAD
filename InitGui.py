@@ -41,7 +41,7 @@ class PhuruWorkbench ( Workbench ):
 		#from Conectividad import PhWifiConfiguracion
 		#from Conectividad import PhWifiEjecucion
 		from Avanzado import PhConfiguracion
-		from Calibracion import PhControlOrientacion, PhSetParametros
+		from Calibracion import PhControlOrientacion, PhSetParametros, PhCalibracionAcelerometro
 		from Generales import PhDashboard, PhComandos
 
 		#self.appendToolbar("PHURU", ["USB_Tool"])
@@ -54,7 +54,7 @@ class PhuruWorkbench ( Workbench ):
 		self.appendMenu(["PHURU", "&Generales"], ["DASHBOARD", "COMANDOS"])
 		self.appendMenu(["PHURU", "&Avanzado"], ["Separator", "Configuracion"])
 		self.appendMenu(["PHURU", "&Calibración"], 
-					["CONTROL_ORIENTACION", "SET_PARAMETROS_CALIBRACION"])
+					["CONTROL_ORIENTACION", "SET_PARAMETROS_CALIBRACION", "CALIBRACION_ACELEROMETRO"])
 
 	def GetClassName(self):
 		#return "PhuruGui::Workbench"
