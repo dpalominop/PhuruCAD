@@ -5,7 +5,7 @@ El principal manual a utilizar es la documentación oficial de FreeCAD: http://w
 Creación de Módulos: http://www.freecadweb.org/wiki/index.php?title=Module_Creation
 
 
-Download the latest released version, extract the archive file, and copy the CadQuery directory to FreeCAD's Mod directory on your system. The module is implemented completely in Python so it should just work the next time you start FreeCAD. Some typical Mod directory locations are as follows.
+Download the latest released version, extract the archive file, and copy the PHURU directory to FreeCAD's Mod directory on your system. The module is implemented completely in Python so it should just work the next time you start FreeCAD. Some typical Mod directory locations are as follows.
 
 
 ## **Linux**
