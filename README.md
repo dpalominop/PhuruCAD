@@ -1,32 +1,31 @@
-# README #
+# **Bienvenidos**
 
-This README would normally document whatever steps are necessary to get your application up and running.
+El principal manual a utilizar es la documentación oficial de FreeCAD: http://www.freecadweb.org/wiki/index.php?title=Manual
 
-### What is this repository for? ###
+Creación de Módulos: http://www.freecadweb.org/wiki/index.php?title=Module_Creation
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
-### How do I get set up? ###
+Download the latest released version, extract the archive file, and copy the PHURU directory to FreeCAD's Mod directory on your system. The module is implemented completely in Python so it should just work the next time you start FreeCAD. Some typical Mod directory locations are as follows.
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
 
-### Contribution guidelines ###
+## **Linux**
 
-* Writing tests
-* Code review
-* Other guidelines
+* /usr/lib/freecad/Mod
+* /usr/local/lib/freecad/Mod
+
+## **Windows**
+
+* C:\Program Files\FreeCAD 0.14\Mod
+* C:\Program Files (x86)\FreeCAD 0.14\Mod
+
+## **Mac**
+
+* /Applications/FreeCAD.app/Contents/Mod
+* /Applications/FreeCAD.app/Mod
 
 ### Who do I talk to? ###
 
 * Autor: Daniel Palomino
-* Correo: dpalomino@phuru.pe
+* Correo: dapalominop@gmail.com
 
 * Equipo: PHURU
-* Correo: team@phuru.pe
