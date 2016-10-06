@@ -26,7 +26,6 @@ Download the latest released version, extract the archive file, and copy the PHU
 ### Who do I talk to? ###
 
 * Autor: Daniel Palomino
-* Correo: dpalomino@phuru.pe
+* Correo: dapalominop@gmail.com
 
 * Equipo: PHURU
-* Correo: team@phuru.pe
